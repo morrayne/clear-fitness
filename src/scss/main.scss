@@ -1,0 +1,9 @@
+// GLOBALS, FONTS AND HEADER
+@use "./globals";
+@use "./fonts";
+@use "../header/header.style";
+
+// PAGES
+@use "../pages/settings/settings.style";
+@use "../pages/home/home.style";
+@use "../pages/form/form.style";
