@@ -1,7 +1,6 @@
 import localforage from "localforage";
 
-// Настройка хранилища
-const store = localforage.createInstance({
+export const store = localforage.createInstance({
   name: "myAppDB"
 });
 
@@ -28,7 +27,6 @@ export interface Data {
 
 // ==================== Инициализация ====================
 export async function initDB() {
-  // Если данных нет, создаём дефолтные значения
   const general = await store.getItem<General>("general");
   if (!general) {
     await store.setItem("general", { weight: 72.5, height: 180, age: 21, gender: "Male" });
