@@ -31,7 +31,7 @@ export async function initDB() {
   // Если данных нет, создаём дефолтные значения
   const general = await store.getItem<General>("general");
   if (!general) {
-    await store.setItem("general", { weight: 71.5, height: 180, age: 21, gender: "Male" });
+    await store.setItem("general", { weight: 72.5, height: 180, age: 21, gender: "Male" });
   }
 
   const macros = await store.getItem<Macros>("macros");

@@ -24,9 +24,6 @@ const formData = reactive<General & { tdee: number }>({
   tdee: 1.55,
 });
 
-// Переменная для хранения данных макросов из finalScreen
-const macrosData = ref<Macros | null>(null);
-
 // ==================== Инициализация ====================
 async function initDB() {
   const general = await store.getItem<General>("general");
@@ -59,12 +56,6 @@ async function loadData() {
   if (macros) formData.tdee = macros.tdee;
 }
 
-// Функция для получения данных макросов из finalScreen
-function setMacrosData(macros: Macros) {
-  macrosData.value = macros;
-}
-
-// ==================== Монтирование ====================
 onMounted(async () => {
   await initDB();
   await loadData();
@@ -84,14 +75,29 @@ async function goNext() {
   currentPage.value++;
 }
 
-async function finish() {
-  // Сохраняем ВСЕ данные только при нажатии Finish
-  await saveAllData();
-  router.push("/home");
+// ==================== Сохранение ====================
+
+// Функция для расчета макросов
+function calculateMacros(data: General & { tdee: number }): Macros {
+  let genderNum = 0;
+  if (data.gender === "Male") genderNum = 5;
+  else if (data.gender === "Female") genderNum = -161;
+  else genderNum = -78;
+
+  const bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age + genderNum;
+  const kcal = Math.round(bmr * data.tdee);
+
+  return {
+    kcal,
+    tdee: data.tdee,
+    intake: 0,
+    proteins: Math.round(data.weight * 1.6),
+    carbs: 0,
+    fats: Math.round(data.weight * 0.9),
+  };
 }
 
-// Функция сохранения ВСЕХ данных
-async function saveAllData() {
+async function finish() {
   try {
     // Сохраняем общие данные
     await store.setItem("general", {
@@ -101,48 +107,19 @@ async function saveAllData() {
       gender: formData.gender,
     });
 
-    // Если есть данные макросов из finalScreen, сохраняем их
-    if (macrosData.value) {
-      await store.setItem("macros", macrosData.value);
-    } else {
-      // Или рассчитываем базовые макросы
-      const baseMacros: Macros = {
-        kcal: calculateBaseCalories(),
-        tdee: formData.tdee,
-        intake: 0,
-        proteins: Math.round(formData.weight * 1.6),
-        carbs: 0,
-        fats: Math.round(formData.weight * 0.9),
-      };
-      await store.setItem("macros", baseMacros);
-    }
+    // Сохраняем макросы
+    const macros = calculateMacros(formData);
+    await store.setItem("macros", macros);
 
-    // Показываем подтверждение
-    const savedGeneral = await store.getItem<General>("general");
-    const savedMacros = await store.getItem<Macros>("macros");
+    // Проверка
+    console.log("General:", await store.getItem("general"));
+    console.log("Macros:", await store.getItem("macros"));
 
-    console.log("Data saved to database:");
-    console.log("General:", savedGeneral);
-    console.log("Macros:", savedMacros);
+    router.push("/home");
   } catch (error) {
     console.error("Error saving data:", error);
     alert("Error saving data. Please try again.");
   }
-}
-
-// Вспомогательная функция для расчета базовых калорий
-function calculateBaseCalories(): number {
-  const data = formData;
-  let genderNum = 0;
-  if (data.gender === "Male") {
-    genderNum = 5;
-  } else if (data.gender === "Female") {
-    genderNum = -161;
-  } else {
-    genderNum = -78;
-  }
-  const bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age + genderNum;
-  return Math.round(bmr * data.tdee);
 }
 </script>
 
@@ -157,10 +134,7 @@ function calculateBaseCalories(): number {
       <!-- HEIGHT -->
       <div
         class="form-page"
-        :style="{
-          transform: transformStyle,
-          opacity: currentPage === 0 ? 1 : 0,
-        }"
+        :style="{ transform: transformStyle, opacity: currentPage === 0 ? 1 : 0 }"
       >
         <span class="form-span">
           <h2>What is your height?</h2>
@@ -180,10 +154,7 @@ function calculateBaseCalories(): number {
       <!-- GENDER -->
       <div
         class="form-page"
-        :style="{
-          transform: transformStyle,
-          opacity: currentPage === 1 ? 1 : 0,
-        }"
+        :style="{ transform: transformStyle, opacity: currentPage === 1 ? 1 : 0 }"
       >
         <span class="form-span">
           <h2>Select Gender</h2>
@@ -195,10 +166,7 @@ function calculateBaseCalories(): number {
       <!-- TDEE -->
       <div
         class="form-page"
-        :style="{
-          transform: transformStyle,
-          opacity: currentPage === 2 ? 1 : 0,
-        }"
+        :style="{ transform: transformStyle, opacity: currentPage === 2 ? 1 : 0 }"
       >
         <span class="form-span form-span-a">
           <h2>How active your lifestyle is?</h2>
@@ -206,13 +174,11 @@ function calculateBaseCalories(): number {
         </span>
         <tdeeComponent v-model="formData.tdee" :active="formData.tdee" />
       </div>
+
       <!-- BODY WEIGHT -->
       <div
         class="form-page"
-        :style="{
-          transform: transformStyle,
-          opacity: currentPage === 3 ? 1 : 0,
-        }"
+        :style="{ transform: transformStyle, opacity: currentPage === 3 ? 1 : 0 }"
       >
         <span class="form-span">
           <h2>What is your body weight?</h2>
@@ -232,10 +198,7 @@ function calculateBaseCalories(): number {
       <!-- AGE -->
       <div
         class="form-page"
-        :style="{
-          transform: transformStyle,
-          opacity: currentPage === 4 ? 1 : 0,
-        }"
+        :style="{ transform: transformStyle, opacity: currentPage === 4 ? 1 : 0 }"
       >
         <span class="form-span">
           <h2>What is your age?</h2>
@@ -255,16 +218,13 @@ function calculateBaseCalories(): number {
       <!-- FINAL SCREEN -->
       <div
         class="form-page"
-        :style="{
-          transform: transformStyle,
-          opacity: currentPage === 5 ? 1 : 0,
-        }"
+        :style="{ transform: transformStyle, opacity: currentPage === 5 ? 1 : 0 }"
       >
         <span class="form-span">
           <h2>Here's what we think</h2>
           <p>You can modify your intake depending on your goals</p>
         </span>
-        <finalScreen :form-data="formData" @save-macros="setMacrosData" />
+        <finalScreen :form-data="formData" />
       </div>
     </div>
 
