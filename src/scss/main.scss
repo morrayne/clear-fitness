@@ -1,9 +1,18 @@
 // GLOBALS, FONTS AND HEADER
 @use "./globals";
 @use "./fonts";
-@use "../header/header.style";
+
 
 // PAGES
-@use "../pages/settings/settings.style";
+// header
+@use "../header/header.style";
+// home
 @use "../pages/home/home.style";
+// calories
+@use "../pages/callories/callories.style";
+// training
+@use "../pages/training/training.style";
+// settings
+@use "../pages/settings/settings.style";
+// form
 @use "../pages/form/form.style";

@@ -6,7 +6,7 @@ header {
   gap: 8px;
   padding: 8px;
   background: var(--bg-2);
-  border-top: solid 1px var(--bg-2);
+  border-top: solid 2px var(--bg-2);
   position: fixed;
   bottom: 0;
   left: 0;
@@ -16,8 +16,8 @@ header {
   width: 100%;
   aspect-ratio: 1 / 1;
   padding: 4px;
-  border: solid 1px var(--bg-4);
-  background: var(--bg-3);
+  border: solid 2px var(--bg-3);
+  background: var(--bg-2);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -29,6 +29,7 @@ header {
   img {
     width: 18px;
     aspect-ratio: 1 / 1;
+    filter: invert(var(--svg-invert));
   }
 
   span {
@@ -38,5 +39,5 @@ header {
 
 .router-link-active {
   opacity: 1;
-  background: var(--bg-4);
+  background: var(--bg-3);
 }

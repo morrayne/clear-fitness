@@ -1,5 +1,5 @@
 <script setup lang="ts"></script>
 
 <template>
-    <span>training</span>
+  <div class="training">coming soon</div>
 </template>
