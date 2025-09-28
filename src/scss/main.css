@@ -518,6 +518,7 @@ header {
   justify-content: center;
 }
 .final .bar-holder .bar {
+  width: 80%;
   height: 100%;
   display: flex;
   gap: 4px;
@@ -540,11 +541,4 @@ header {
 .final .bar-holder .bar .f {
   min-width: 42px;
   background: var(--f);
-}
-.final .bar-holder .bar-0 {
-  width: 80%;
-}
-.final .bar-holder .bar-intake {
-  max-width: 100%;
-  min-width: 60%;
 }/*# sourceMappingURL=main.css.map */

@@ -8,99 +8,76 @@ import tdeeComponent from "./components/tdeeComponent.vue";
 import finalScreen from "./components/finalScreen.vue";
 
 import { store, initDB } from "../../data/database.script";
-
-interface General {
-  weight: number;
-  height: number;
-  age: number;
-  gender: string;
-}
-
-interface Macros {
-  kcal: number;
-  tdee: number;
-  intake: number;
-  proteins: number;
-  carbs: number;
-  fats: number;
-}
+import type { General, Macros } from "../../data/database.script";
+import { calculateIntake } from "./form.script";
 
 const router = useRouter();
-const currentPage = ref(0);
 
-// reactive объект формы
-const formData = reactive<General & { tdee: number }>({
+// ВРЕМЕННОЕ ХРАНИЛИЩЕ ДАННЫХ
+const intake = ref(0);
+const tdee = ref(1.55);
+const formData = reactive<General>({
   weight: 72.5,
   height: 180,
   age: 21,
   gender: "Male",
-  tdee: 1.55,
 });
 
-// reactive объект макросов
-const macrosData = reactive<Macros>({
-  kcal: 0,
-  tdee: formData.tdee,
-  intake: 0,
-  proteins: 0,
-  carbs: 0,
-  fats: 0,
-});
+// ВЫЧИСЛЕНИЕ МАКРОСОВ
+const macrosData = computed<Macros>(() =>
+  calculateIntake({ ...formData, tdee: tdee.value }, intake.value)
+);
 
-// ==================== Инициализация ====================
+// ЗАГРУЗКА ДАННЫХ ИЗ БД
 async function loadData() {
   const general = await store.getItem<General>("general");
-  const macros = await store.getItem<Macros>("macros");
+  const savedMacros = await store.getItem<Macros>("macros");
 
   if (general) Object.assign(formData, general);
-  if (macros) Object.assign(macrosData, macros);
+  if (savedMacros) {
+    intake.value = savedMacros.intake;
+    tdee.value = savedMacros.tdee; 
+  }
 }
 
+// ОБНОВЛЕНИЕ INTAKE ИЗ ДОЧЕРНЕГО КОМПОНЕНТА
+function handleSaveMacros(newIntake: number) {
+  intake.value = newIntake;
+}
+
+// НАВИГАЦИЯ МЕЖДУ СТРАНИЦАМИ ФОРМЫ
+const currentPage = ref(0);
+function goNext() {
+  if (currentPage.value < 5) currentPage.value++;
+}
+function goBack() {
+  if (currentPage.value === 0) router.push("/home");
+  else currentPage.value--;
+}
+const transformStyle = computed(
+  () => `translateX(calc(-${currentPage.value} * 100%))`
+);
+
+// СОХРАНЕНИЕ В БД
+async function finish() {
+  try {
+    await store.setItem("general", { ...formData });
+    await store.setItem("macros", { ...macrosData.value });
+    router.push("/home");
+  } catch (error) {
+    console.error("Error saving data:", error);
+  }
+}
+
+// ИНИЦИАЛИЗАЦИЯ ПРИ МОНТИРОВАНИИ
 onMounted(async () => {
   await initDB();
   await loadData();
 });
-
-// ==================== Навигация ====================
-const transformStyle = computed(() => `translateX(calc(-${currentPage.value} * 100%))`);
-
-async function goBack() {
-  if (currentPage.value === 0) router.push("/home");
-  else currentPage.value--;
-}
-
-async function goNext() {
-  currentPage.value++;
-}
-
-// ==================== Получение данных из финального экрана ====================
-function handleSaveMacros(macros: Macros) {
-  Object.assign(macrosData, macros);
-}
-
-// ==================== Сохранение ====================
-async function finish() {
-  try {
-    await store.setItem("general", {
-      weight: formData.weight,
-      height: formData.height,
-      age: formData.age,
-      gender: formData.gender,
-    });
-
-    // Сохраняем plain object
-    await store.setItem("macros", { ...macrosData });
-
-    router.push("/home");
-  } catch (error) {
-    console.error("Error saving data:", error);
-    alert("Error saving data. Please try again.");
-  }
-}
-
 </script>
 
 <template>
+  <!-- prettier-ignore -->
   <div class="form-wrapper">
     <button class="back" @click="goBack">
       <img src="../../../public/svg/arrow-more.svg" />
@@ -131,7 +108,7 @@ async function finish() {
           <h2>How active your lifestyle is?</h2>
           <p>This needs to be changed manually if anything</p>
         </span>
-        <tdeeComponent v-model="formData.tdee" :active="formData.tdee" />
+        <tdeeComponent v-model="tdee" :active="tdee" />
       </div>
 
       <!-- BODY WEIGHT -->
@@ -158,7 +135,7 @@ async function finish() {
           <h2>Here's what we think</h2>
           <p>You can modify your intake depending on your goals</p>
         </span>
-        <finalScreen :form-data="formData" @saveMacros="handleSaveMacros" />
+        <finalScreen :form-data="formData" :macrosData="macrosData" @saveMacros="handleSaveMacros"/>
       </div>
     </div>
 

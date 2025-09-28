@@ -1,64 +1,62 @@
 <script setup lang="ts">
-import { ref, computed, toRefs, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import inputHorizontal from "./inputHorizontal.vue";
+import type { General, Macros } from "../../../data/database.script";
 import { calculateIntake } from "../form.script";
 
-interface formDataType {
-  weight: number;
-  height: number;
-  age: number;
-  gender: string;
-  tdee: number;
-}
+// ПРОПСЫ И ПЕРЕМЕННЫЕ
+const props = defineProps<{
+  formData: General;
+  macrosData: Macros; // базовые макросы с tdee
+}>();
 
-interface Macros {
-  kcal: number;
-  tdee: number;
-  intake: number;
-  proteins: number;
-  carbs: number;
-  fats: number;
-}
+const preintake = ref(props.macrosData.intake ?? 0);
 
-const props = defineProps<{ formData: formDataType }>();
-const { formData } = toRefs(props);
-const preintake = ref(0);
+// EMIT В РОДИТЕЛЯ
+const emit = defineEmits<{ (e: "saveMacros", value: number): void }>();
 
-const intakeMacros = computed(() => calculateIntake(formData.value, preintake.value));
+// ПЕРЕСЧЕТ МАКРОСОВ ПРИ ИЗМЕНЕНИИ ПОЛЗУНКА
+const intakeMacros = computed<Macros>(() =>
+  calculateIntake({ ...props.formData, tdee: props.macrosData.tdee }, preintake.value)
+);
 
-const proteins = computed(() => intakeMacros.value.proteins);
-const fats = computed(() => intakeMacros.value.fats);
-const carbs = computed(() => intakeMacros.value.carbs);
-const tdee = computed(() => intakeMacros.value.kcal);
+// ШИРИНЫ БЖУ
+const widths = computed(() => {
+  const total = intakeMacros.value.proteins + intakeMacros.value.fats + intakeMacros.value.carbs;
+  return {
+    protein: total ? `${Math.round((intakeMacros.value.proteins / total) * 1000) / 10}%` : "0%",
+    fat: total ? `${Math.round((intakeMacros.value.fats / total) * 1000) / 10}%` : "0%",
+    carb: total ? `${Math.round((intakeMacros.value.carbs / total) * 1000) / 10}%` : "0%",
+  };
+});
 
-const emit = defineEmits<{ (e: "saveMacros", macros: Macros): void }>();
 
-// Автоматически эмитим макросы при изменениях
-watch([() => preintake.value, () => formData.value], () => {
-  emit("saveMacros", { ...intakeMacros.value });
-}, { deep: true, immediate: true });
-
-// ==================== Ширины ====================
-const getBaseWidth = (value: number, total: number) => {
-  if (total === 0) return "0%";
-  return `${Math.round((value / total) * 1000) / 10}%`;
-};
+// СИНХРОНИЗАЦИЯ С РОДИТЕЛЕМ
+watch(preintake, (val) => emit("saveMacros", val), { immediate: true });
 </script>
 
 <template>
   <div class="final">
-    <p v-if="preintake === 0">To keep current body weight: {{ tdee }} kcal</p>
-    <p v-else-if="preintake > 0">To increase body weight: {{ tdee }} kcal</p>
-    <p v-else>To decrease body weight: {{ tdee }} kcal</p>
+    <p v-if="preintake === 0">To keep current body weight: {{ intakeMacros.kcal }} kcal</p>
+    <p v-else-if="preintake > 0">To increase body weight: {{ intakeMacros.kcal }} kcal</p>
+    <p v-else>To decrease body weight: {{ intakeMacros.kcal }} kcal</p>
 
     <div class="bar-holder">
-      <div class="bar bar-intake">
-        <div class="p part" :style="{ width: getBaseWidth(proteins, proteins + carbs + fats) }">{{ proteins }} p</div>
-        <div class="f part" :style="{ width: getBaseWidth(fats, proteins + carbs + fats) }">{{ fats }} f</div>
-        <div class="c part" :style="{ width: getBaseWidth(carbs, proteins + carbs + fats) }">{{ carbs }} c</div>
+      <div class="bar">
+        <div class="p part" :style="{ width: widths.protein }">{{ intakeMacros.proteins }} p</div>
+        <div class="f part" :style="{ width: widths.fat }">{{ intakeMacros.fats }} f</div>
+        <div class="c part" :style="{ width: widths.carb }">{{ intakeMacros.carbs }} c</div>
       </div>
     </div>
 
-    <inputHorizontal v-model="preintake" :min="-20" :max="20" :step="1" :mod="1" text="%" :bigStep="10" />
+    <inputHorizontal
+      v-model="preintake"
+      :min="-20"
+      :max="20"
+      :step="1"
+      :mod="1"
+      text="%"
+      :bigStep="10"
+    />
   </div>
 </template>

@@ -229,7 +229,7 @@
 
   p {
     width: fit-content;
-    margin: 0 auto;
+    margin: 0 auto; 
     padding: 4px 16px;
     border-radius: 6px;
     font-weight: 700;
@@ -246,6 +246,7 @@
     justify-content: center;
 
     .bar {
+      width: 80%;
       height: 100%;
       display: flex;
       gap: 4px;
@@ -272,15 +273,6 @@
         min-width: 42px;
         background: var(--f);
       }
-    }
-
-    .bar-0 {
-      width: 80%;
-    }
-
-    .bar-intake {
-      max-width: 100%;
-      min-width: 60%;
     }
   }
 }

@@ -1,9 +1,7 @@
 <script setup lang="ts">
 interface CardItem {
-  textEN: string;
-  textRU: string;
-  timeEN: string;
-  timeRU: string;
+  text: string;
+  time: string;
   value: number;
   measurement: string;
 }
@@ -15,8 +13,8 @@ const props = defineProps<{
 
 <template>
   <div class="card">
-    <span>{{ props.card.textEN }}</span>
-    <p>{{ props.card.timeEN }}</p>
+    <span>{{ props.card.text }}</span>
+    <p>{{ props.card.time }}</p>
     <div class="more">
       <span>{{ props.card.value }}</span>
       <p>{{ props.card.measurement }}</p>
