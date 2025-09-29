@@ -161,9 +161,9 @@ body {
 }
 header {
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  height: var(--header-height);
+  display: flex;
+  justify-content: space-between;
   padding: 8px;
   background: var(--bg-2);
   border-top: solid 2px var(--bg-2);
@@ -173,7 +173,7 @@ header {
 }
 
 .header-link {
-  width: 100%;
+  height: 100%;
   aspect-ratio: 1/1;
   padding: 4px;
   border: solid 2px var(--bg-3);
@@ -252,6 +252,28 @@ header {
   flex-direction: column;
   gap: 8px;
 }
+.callories-wrapper .week-holder {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.callories-wrapper .week-holder .item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-2);
+  padding: 8px 4px;
+  border-radius: 120px;
+  text-align: center;
+  font-size: 18px;
+}
+.callories-wrapper .week-holder .item span {
+  color: var(--text-4);
+}
+.callories-wrapper .week-holder .active {
+  outline: solid 2px var(--text-1);
+}
 .callories-wrapper h1 {
   display: flex;
   flex-direction: column;
@@ -263,42 +285,51 @@ header {
 .callories-wrapper h1 p {
   font-size: 22px;
 }
-.callories-wrapper .summary-table {
-  padding: 6px;
-  border-radius: 8px;
-}
-.callories-wrapper .summary-table .summary-row {
+.callories-wrapper .summary-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
+  margin: 16px 0;
+  overflow: hidden;
 }
-.callories-wrapper .summary-table .summary-row .kcal {
-  border-left: solid 3px var(--kcal);
-}
-.callories-wrapper .summary-table .summary-row .p {
-  border-left: solid 3px var(--p);
-}
-.callories-wrapper .summary-table .summary-row .c {
-  border-left: solid 3px var(--c);
-}
-.callories-wrapper .summary-table .summary-row .f {
-  border-left: solid 3px var(--f);
-}
-.callories-wrapper .summary-table .summary-row .macro-item {
+.callories-wrapper .summary-row .macro-item {
+  min-width: -moz-fit-content;
+  min-width: fit-content;
   display: flex;
   flex-direction: column;
-  padding: 4px;
+  padding: 0 4px 6px;
   border-radius: 0 6px 0 0;
-  background: var(--bg-2);
+  position: relative;
 }
-.callories-wrapper .summary-table .summary-row .macro-item .value {
-  font-size: 18px;
+.callories-wrapper .summary-row .macro-item p {
+  white-space: nowrap;
   text-align: center;
-}
-.callories-wrapper .summary-table .summary-row .macro-item .label {
   font-size: 14px;
   font-weight: 700;
-  text-align: center;
+}
+.callories-wrapper .summary-row .macro-item .bar {
+  max-width: 100%;
+  width: 100%;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--bg-3);
+  position: absolute;
+  z-index: 2;
+  bottom: 0;
+  left: 0;
+  transition: 1s;
+}
+.callories-wrapper .summary-row .macro-item .kcal {
+  border-bottom: solid 4px var(--kcal);
+}
+.callories-wrapper .summary-row .macro-item .p {
+  border-bottom: solid 4px var(--p);
+}
+.callories-wrapper .summary-row .macro-item .c {
+  border-bottom: solid 4px var(--c);
+}
+.callories-wrapper .summary-row .macro-item .f {
+  border-bottom: solid 4px var(--f);
 }
 .callories-wrapper .something {
   display: flex;
@@ -330,6 +361,7 @@ header {
   display: flex;
   overflow: hidden;
   gap: 8px;
+  padding-bottom: var(--header-height);
 }
 .callories-wrapper .something .screen .comp {
   min-width: calc(100% - 8px);
@@ -337,7 +369,10 @@ header {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding-bottom: 80px;
+  overflow: hidden;
+}
+.callories-wrapper .something .screen .comp .food-history {
+  overflow-y: scroll;
 }
 .callories-wrapper .something .screen .comp .create-preset {
   height: 100%;
@@ -394,10 +429,11 @@ header {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow-y: scroll;
 }
 .callories-wrapper .presets .item {
   width: 100%;
-  height: 80px;
+  height: 75px;
   background: var(--bg-2);
   display: flex;
   gap: 16px;
@@ -411,14 +447,23 @@ header {
   background: var(--bg-3);
 }
 .callories-wrapper .presets .item .right {
+  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 .callories-wrapper .presets .item .right .top {
-  text-align: left;
-  font-size: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.callories-wrapper .presets .item .right .top span {
+  font-size: 18px;
   font-weight: 700;
+}
+.callories-wrapper .presets .item .right .top p {
+  color: var(--text-4);
 }
 .callories-wrapper .presets .item .right .bot {
   display: flex;
@@ -427,161 +472,21 @@ header {
 .callories-wrapper .presets .item .right .bot * {
   padding: 2px 8px;
   border-radius: 0 6px 6px 6px;
-  color: var(--bg-2);
+  color: var(--text-4);
   font-size: 14px;
+  font-weight: 700;
 }
 .callories-wrapper .presets .item .right .bot .kcal {
-  background: var(--kcal);
-  color: var(--bg-2);
+  outline: solid 2px var(--kcal);
 }
 .callories-wrapper .presets .item .right .bot .p {
-  background: var(--p);
+  outline: solid 2px var(--p);
 }
 .callories-wrapper .presets .item .right .bot .c {
-  background: var(--c);
+  outline: solid 2px var(--c);
 }
 .callories-wrapper .presets .item .right .bot .f {
-  background: var(--f);
-}
-.callories-wrapper .add-food {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.callories-wrapper .add-food h3 {
-  margin: 0 0 12px 0;
-  color: var(--text-2);
-}
-.callories-wrapper .add-food .search-section {
-  margin-bottom: 12px;
-}
-.callories-wrapper .add-food .search-input {
-  width: 100%;
-  padding: 8px;
-  background: var(--bg-3);
-  border: 1px solid var(--bg-4);
-  border-radius: 6px;
-  color: var(--text-2);
-}
-.callories-wrapper .add-food .search-input::-moz-placeholder {
-  color: var(--text-4);
-}
-.callories-wrapper .add-food .search-input::placeholder {
-  color: var(--text-4);
-}
-.callories-wrapper .add-food .search-results {
-  background: var(--bg-3);
-  border: 1px solid var(--bg-4);
-  border-radius: 6px;
-  max-height: 150px;
-  overflow-y: auto;
-  margin-top: 4px;
-}
-.callories-wrapper .add-food .search-result-item {
-  padding: 8px;
-  border-bottom: 1px solid var(--bg-4);
-  cursor: pointer;
-}
-.callories-wrapper .add-food .search-result-item:last-child {
-  border-bottom: none;
-}
-.callories-wrapper .add-food .search-result-item:hover {
-  background: var(--bg-4);
-}
-.callories-wrapper .add-food .food-name {
-  display: block;
-  font-weight: 600;
-  color: var(--text-2);
-  margin-bottom: 2px;
-}
-.callories-wrapper .add-food .food-macros {
-  font-size: 11px;
-  color: var(--text-4);
-}
-.callories-wrapper .add-food .selected-food {
-  background: var(--bg-3);
-  border-radius: 6px;
-  padding: 12px;
-  margin-top: 8px;
-}
-.callories-wrapper .add-food .selected-info {
-  margin-bottom: 12px;
-}
-.callories-wrapper .add-food .selected-info strong {
-  color: var(--text-2);
-  display: block;
-  margin-bottom: 4px;
-}
-.callories-wrapper .add-food .selected-info .macros {
-  font-size: 12px;
-  color: var(--text-4);
-}
-.callories-wrapper .add-food .quantity-section {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.callories-wrapper .add-food .quantity-section label {
-  color: var(--text-3);
-  font-size: 14px;
-  white-space: nowrap;
-}
-.callories-wrapper .add-food .quantity-input {
-  width: 80px;
-  padding: 6px;
-  background: var(--bg-2);
-  border: 1px solid var(--bg-4);
-  border-radius: 4px;
-  color: var(--text-2);
-  text-align: center;
-}
-.callories-wrapper .add-food .add-button {
-  background: var(--success);
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  width: 100%;
-}
-.callories-wrapper .table {
-  width: 100%;
-  height: 160px;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-}
-.callories-wrapper .table .active {
-  outline: solid 2px var(--text-1);
-}
-.callories-wrapper .table .item {
-  width: 100%;
-  height: 100%;
-  background: var(--bg-2);
-  border-radius: 6px;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.callories-wrapper .table .item * {
-  width: 100%;
-  min-height: 24px;
-  border-radius: 2px;
-}
-.callories-wrapper .table .item .p {
-  height: 30%;
-  background: var(--p);
-}
-.callories-wrapper .table .item .c {
-  height: 50%;
-  background: var(--c);
-}
-.callories-wrapper .table .item .f {
-  height: 20%;
-  background: var(--f);
+  outline: solid 2px var(--f);
 }
 
 .training {
