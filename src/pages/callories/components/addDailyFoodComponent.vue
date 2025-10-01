@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useCalories, type FoodItem } from "../callories.script";
-import { saveFoodsToDatabase } from "../callories.script"; // Импортируем функцию сохранения
+import { saveFoodsToDatabase } from "../callories.script";
 
 const { foodDatabase, addFoodToToday } = useCalories();
 
@@ -11,50 +11,49 @@ const isLongPress = ref(false);
 const hasHandled = ref(false);
 const currentItem = ref<FoodItem | null>(null);
 
+// ДОБАВЛЕНИЕ ЕДЫ В СЕГОДЯНШЕЕ УПОТРЕБЛЕНИЕ
 const addToday = async (foodItem: FoodItem) => {
   await addFoodToToday(foodItem);
 };
 
+// УДАЛЕНИЕ СВОЕГО ПРЕСЕТА ЕДЫ
 const deletePreset = async (foodItem: FoodItem) => {
-  console.log("Deleting preset:", foodItem.name);
   const index = foodDatabase.value.findIndex(item => item.id === foodItem.id);
   if (index > -1) {
     foodDatabase.value.splice(index, 1);
-    // Сохраняем изменения в базу данных
     await saveFoodsToDatabase();
   }
 };
 
+// НАЧАЛО НАЖАТИЯ И ПОПЫТКА ПОНЯТЬ НАЖАТИЕ ИЛИ ЗАЖАТИЕ
 const startPress = (foodItem: FoodItem, event: Event) => {
   event.preventDefault();
   if (hasHandled.value) return;
-  
   currentItem.value = foodItem;
   hasHandled.value = false;
   isLongPress.value = false;
-  
   pressTimer.value = setTimeout(async () => {
     hasHandled.value = true;
     isLongPress.value = true;
     await deletePreset(foodItem);
     currentItem.value = null;
-  }, 3000);
+  }, 1000);
 };
 
+// ОКОНЧАНИЕ НАЖАТИЯ
 const endPress = async (event: Event) => {
   event.preventDefault();
   clearTimeout(pressTimer.value);
   pressTimer.value = null;
-  
   if (currentItem.value && !isLongPress.value && !hasHandled.value) {
     hasHandled.value = true;
     await addToday(currentItem.value);
   }
-  
   isLongPress.value = false;
   currentItem.value = null;
 };
 
+// ОТМЕНА НАЖАТИЯ
 const cancelPress = () => {
   clearTimeout(pressTimer.value);
   pressTimer.value = null;
@@ -65,18 +64,9 @@ const cancelPress = () => {
 </script>
 
 <template>
+  <!-- prettier-ignore -->
   <div class="presets">
-    <div
-      v-for="preset in presets"
-      :key="preset.id"
-      class="item"
-      @mousedown="startPress(preset, $event)"
-      @touchstart="startPress(preset, $event)"
-      @mouseup="endPress($event)"
-      @touchend="endPress($event)"
-      @mouseleave="cancelPress"
-      @touchcancel="cancelPress"
-    >
+    <div v-for="preset in presets" :key="preset.id" class="item" @mousedown="startPress(preset, $event)" @touchstart="startPress(preset, $event)" @mouseup="endPress($event)"@touchend="endPress($event)" @mouseleave="cancelPress" @touchcancel="cancelPress">
       <div class="left"></div>
       <div class="right">
         <div class="top">
@@ -91,7 +81,6 @@ const cancelPress = () => {
         </div>
       </div>
     </div>
-
     <div v-if="presets.length === 0" class="empty-state">
       No food presets created yet
     </div>

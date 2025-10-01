@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { ref, watch } from "vue";
 import { useCalories } from "../callories.script";
 
-const { foodDatabase, addCustomFood } = useCalories();
-
-onMounted(() => {
-  console.log("Current food database:", foodDatabase.value);
-});
+const { addCustomFood } = useCalories();
 
 const newFood = ref({
   name: "",
@@ -14,10 +10,10 @@ const newFood = ref({
   protein: "",
   carbs: "",
   fat: "",
-  portionSize: "100", // грамовка по умолчанию
+  portionSize: "100",
 });
 
-// Функция для расчета калорий из БЖУ
+// ПОПЫТКА РАСЧЕТА КАЛОРИЙ ПО ВВЕДЕННОМУ БЖУ
 const calculateCaloriesFromMacros = () => {
   const protein = parseFloat(newFood.value.protein) || 0;
   const carbs = parseFloat(newFood.value.carbs) || 0;
@@ -26,14 +22,8 @@ const calculateCaloriesFromMacros = () => {
   return Math.round(calculatedCalories);
 };
 
-// Следим за изменениями БЖУ и автоматически заполняем калории
-watch(
-  [
-    () => newFood.value.protein,
-    () => newFood.value.carbs,
-    () => newFood.value.fat,
-  ],
-  () => {
+// ПРОВЕРКА БЖУ И АВТОЗАПОЛЕНИЕ КАЛОРИЙ
+watch([() => newFood.value.protein, () => newFood.value.carbs, () => newFood.value.fat], () => {
     if (newFood.value.protein && newFood.value.carbs && newFood.value.fat) {
       const calculated = calculateCaloriesFromMacros();
       newFood.value.calories = calculated.toString();
@@ -41,13 +31,11 @@ watch(
   }
 );
 
+// ДОБАВЛЕНИЕ ПРЕСЕТА В АКТИВНОЕ ИСПОЛЬЗОВАНИЕ
 const handleCreateFood = async () => {
   if (!newFood.value.name || !newFood.value.calories) return;
-
   const portionSize = parseFloat(newFood.value.portionSize) || 100;
   const multiplier = portionSize / 100;
-
-  // Пересчитываем значения на указанную грамовку "в уме"
   const foodItem = {
     id: Date.now().toString(),
     name: newFood.value.name,
@@ -57,11 +45,7 @@ const handleCreateFood = async () => {
     fat: parseFloat((parseFloat(newFood.value.fat) * multiplier).toFixed(1)),
     portionSize: portionSize,
   };
-
-  console.log("Created food item (adjusted for portion):", foodItem);
   await addCustomFood(foodItem);
-  
-  // Сброс формы (оставляем значения на 100г)
   newFood.value = {
     name: "",
     calories: "",
