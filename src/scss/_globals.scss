@@ -1,4 +1,4 @@
-// RESET
+/* ========== RESET ========== */
 *,
 *::before,
 *::after {
@@ -6,15 +6,19 @@
   margin: 0;
   padding: 0;
 }
-html {
+
+html, body {
+  height: 100%;
   font-size: 16px;
   scroll-behavior: smooth;
 }
+
 body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 img,
 picture,
 video,
@@ -23,92 +27,80 @@ svg {
   display: block;
   max-width: 100%;
 }
-input,
-button,
-textarea,
-select {
-  font: inherit;
-}
+
 button {
   cursor: pointer;
   border: none;
   background: none;
+  font: inherit;
+  color: inherit;
 }
+
 a {
   text-decoration: none;
   color: inherit;
 }
+
 ul,
 ol {
   list-style: none;
 }
 
-// DEFAULT
+/* ========== VARIABLES ========== */
 :root {
-  // Font family variable
-  --font-manrope: "Manrope", sans-serif;
+  /* backgrounds */
+  --main-bg: #131414;
+  --sub-bg: #1e1e1e;
+  --extra-bg: #333333;
 
-  // Font weights для Manrope
-  --font-weight-100: 100;
-  --font-weight-200: 200;
-  --font-weight-300: 300;
-  --font-weight-400: 400;
-  --font-weight-500: 500;
-  --font-weight-600: 600;
-  --font-weight-700: 700;
+  /* text */
+  --main-text: #fffffe;
+  --sub-text: #69686a;
 
-  // special
-  --transparent: #00000000;
-  --svg-invert: 0;
-
-  // bg colors
-  --bg-1: #ffffff; /* белый */
-  --bg-2: #f5f5f5; /* очень светлый серый */
-  --bg-3: #e0e0e0; /* средне-светлый серый */
-  --bg-4: #b0b0b0; /* насыщенный серый */
-
-  /* text colors */
-  --text-1: #000000; /* чёрный */
-  --text-2: #1a1a1a; /* очень тёмно-серый */
-  --text-3: #333333; /* тёмно-серый */
-  --text-4: #666666; /* средний серый */
-
-  // other colors
-  --accent-1: #e5eefe;
-  --accent-2: #3964fe;
-
-  //
-  --kcal: #7e41af;
-  --p: rgb(210, 65, 54); /* чуть ярче и чище красный */
-  --c: rgb(46, 160, 67); /* более сбалансированный зелёный */
-  --f: rgb(242, 201, 76); /* светлее и теплее золотистый */
-
-  // header
+  /* header */
   --header-height: 80px;
+  --header-border: #323232;
 
-  // form
-  --tick-1: #888;
+  /* extras */
+  --sub-accent: #e5eefe;
+  --main-accent: #6439fe;
+  --transparent: #00000000;
+  --svg-invert: 1;
+
+  /* macros */
+  --kcal: #4174af;
+  --p: rgb(210, 65, 54);   /* чуть ярче красный */
+  --c: rgb(46, 160, 67);   /* сбалансированный зелёный */
+  --f: rgb(242, 201, 76);  /* светлее золотистый */
 }
 
-// GLOBAL
+/* ========== GLOBAL ========== */
+html {
+  color: var(--main-text);
+  background: var(--main-bg);
+  font-family: "Manrope", sans-serif;
+}
+
 body {
   max-width: 720px;
-  width: 100vw;
-  height: 100vh;
-  background: var(--bg-1);
+  width: 100%;
+  min-height: 100%;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
-  color: var(--text-1);
-  font-family: var(--font-manrope);
 }
+
 #app {
   width: 100%;
-  overflow: hidden;
-  position: relative;
+  height: 100%;
   display: flex;
   flex-direction: column;
+
   overflow-y: auto;
-  /* Скрываем скроллбар во всех браузерах */
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style: none; /* IE */
+  scrollbar-width: none;    /* Firefox */
+}
+
+#app::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
 }

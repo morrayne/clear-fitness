@@ -1,0 +1,42 @@
+.header-wrapper {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+
+  header {
+    width: 100%;
+    height: var(--header-height);
+    max-width: 1280px;
+    border-top: solid 2px var(--header-border);
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+
+    .header-link {
+      height: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      opacity: 0.6;
+
+      img {
+        height: calc(100% - 21px - 4px);
+        filter: invert(var(--svg-invert));
+      }
+
+      p {
+        font-size: 14px;
+        white-space: nowrap;
+        color: var(--main-text);
+      }
+    }
+    .router-link-active {
+      opacity: 1;
+    }
+  }
+}

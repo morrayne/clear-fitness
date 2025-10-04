@@ -4,15 +4,9 @@
 
 
 // PAGES
-// header
-@use "../header/header.style";
-// home
-@use "../pages/home/home.style";
-// calories
-@use "../pages/callories/callories.style";
-// training
-@use "../pages/training/training.style";
-// settings
-@use "../pages/settings/settings.style";
-// form
-@use "../pages/form/form.style";
+@use "../header/scss/main";
+@use "../pages/nameform/scss/style";
+
+// 
+@use "../pages/bodydata/scss/custominput";
+@use "../pages/bodydata/scss/bodydata";

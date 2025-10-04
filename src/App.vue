@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { useRoute } from "vue-router";
-import headerComponent from "./header/header.vue";
-const route = useRoute();
+import HeaderMain from "./header/HeaderMain.vue";
 </script>
 
 <template>
-  <headerComponent v-if="route.meta.header" />
+  <HeaderMain />
   <router-view />
 </template>
