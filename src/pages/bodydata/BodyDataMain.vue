@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, toRaw, inject, type Ref } from "vue";
+import type { RangeValue, ActivityLevel, UserData, UserMacros, BodyData as DBBodyData } from "../../common/database";
+import { ref, watch, computed, onMounted, toRaw, inject, type Ref, type ComputedRef } from "vue";
+import { getBodyData, setBodyData, setUser, getUserData } from "../../common/database";
 import CustomInput from "./components/customInput.vue";
-import type { RangeValue, ActivityLevel, Macros, UserData } from "../../common/database";
-import { getBodyData, setBodyData, setMacros, setUser } from "../../common/database";
-
-// ===== ROUTER =====
 import { useRouter } from "vue-router";
+
+// ROUTER
 const router = useRouter();
 
-// ===== INJECT USER =====
-const user = inject<Ref<UserData | null>>("userdata");
+// INJECT (может быть undefined — делаем fallback)
+const injectedUser = inject<Ref<UserData | null>>("userdata");
+const injectedBody = inject<Ref<DBBodyData> | null>("userbody");
+const injectedMacros = inject<ComputedRef<UserMacros> | null>("usermacros");
 
-// ===== TYPES =====
+// TYPES
 interface BodyData {
   gender: "Male" | "Female" | "Secret";
   age: RangeValue;
@@ -23,8 +25,8 @@ interface BodyData {
   };
 }
 
-// ===== STATE =====
-const tempBody = ref<BodyData>({
+// Если провайдера нет — локальный реф (фолбек)
+const localBody = ref<BodyData>({
   gender: "Male",
   age: { min: 16, max: 80, step: 1, current: 21, goal: 21 },
   height: { min: 140, max: 220, step: 1, current: 180, goal: 180 },
@@ -42,86 +44,44 @@ const tempBody = ref<BodyData>({
   },
 });
 
-// ===== ИНИЦИАЛИЗАЦИЯ ИЗ БД =====
+// bodyRef — используй в шаблоне; это либо injected реф, либо локальный
+const bodyRef = injectedBody ?? (localBody as Ref<BodyData>);
+
+// macrosRef — либо injected computed, либо заглушка (ноль)
+const macrosRef: ComputedRef<UserMacros> = injectedMacros ?? computed(() => ({
+  maintain: { weight: 0, kcal: 0, proteins: 0, fats: 0, carbs: 0 },
+  modify:   { weight: 0, kcal: 0, proteins: 0, fats: 0, carbs: 0 },
+}));
+
+// Если провайдера нет — подгружаем из БД при монтировании (fallback)
 onMounted(async () => {
-  const savedBody = await getBodyData();
-  if (savedBody) {
-    tempBody.value = savedBody;
-  } else {
-    await setBodyData(tempBody.value);
+  if (!injectedBody) {
+    const saved = await getBodyData();
+    if (saved) {
+      // приводим тип DB body к локальному BodyData (совпадают по структуре)
+      (localBody as any).value = saved;
+    } else {
+      await setBodyData(toRaw(localBody.value as any));
+    }
   }
 });
 
-// ===== MACROS =====
-const tempMacros = ref<{ maintain: Macros; modify: Macros }>({
-  maintain: { kcal: 0, proteins: 0, fats: 0, carbs: 0 },
-  modify: { kcal: 0, proteins: 0, fats: 0, carbs: 0 },
-});
-
-// ===== HELPERS =====
+// HELPERS для step-snapping
 function decimalsCount(step: number) {
   const s = String(step);
   if (!s.includes(".")) return 0;
   return s.length - s.indexOf(".") - 1;
 }
-
 function roundToStep(value: number, step: number) {
   const rounded = Math.round(value / step) * step;
   const decimals = decimalsCount(step);
   return Number(rounded.toFixed(decimals));
 }
-
 function unwrapRef(obj: any) {
-  return obj && Object.prototype.hasOwnProperty.call(obj, "value")
-    ? obj.value
-    : obj;
+  return obj && Object.prototype.hasOwnProperty.call(obj, "value") ? obj.value : obj;
 }
 
-// ===== CALCULATE MACROS =====
-function calculateMacros(body: typeof tempBody.value) {
-  const currentWeight = body.weight.current;
-  const goalWeight = body.weight.goal;
-  const height = body.height.current;
-  const age = body.age.current;
-  const BMR =
-    body.gender === "Male"
-      ? 10 * currentWeight + 6.25 * height - 5 * age + 5
-      : 10 * currentWeight + 6.25 * height - 5 * age - 161;
-  const TDEE = BMR * body.activity.current;
-  const maintainProteinsKcal = TDEE * 0.25;
-  const maintainFatsKcal = TDEE * 0.25;
-  const maintainCarbsKcal = TDEE - maintainProteinsKcal - maintainFatsKcal;
-  const maintain = {
-    kcal: Math.round(TDEE),
-    proteins: +(maintainProteinsKcal / 4).toFixed(1),
-    fats: +(maintainFatsKcal / 9).toFixed(1),
-    carbs: +(maintainCarbsKcal / 4).toFixed(1),
-  };
-
-  const modifyTDEE = TDEE + (goalWeight > currentWeight ? 300 : -300);
-  const modifyProteinsKcal = modifyTDEE * 0.25;
-  const modifyFatsKcal = modifyTDEE * 0.25;
-  const modifyCarbsKcal = modifyTDEE - modifyProteinsKcal - modifyFatsKcal;
-  const modify = {
-    kcal: Math.round(modifyTDEE),
-    proteins: +(modifyProteinsKcal / 4).toFixed(1),
-    fats: +(modifyFatsKcal / 9).toFixed(1),
-    carbs: +(modifyCarbsKcal / 4).toFixed(1),
-  };
-
-  return { maintain, modify };
-}
-
-// ===== WATCHERS =====
-watch(
-  tempBody,
-  (newVal) => {
-    tempMacros.value = calculateMacros(newVal);
-  },
-  { deep: true, immediate: true }
-);
-
-// Привязка к шагу (step) для всех input
+// WATCHERS: привязка к step для полей
 const trackedKeys: Array<[keyof BodyData, keyof RangeValue]> = [
   ["weight", "current"],
   ["weight", "goal"],
@@ -131,9 +91,9 @@ const trackedKeys: Array<[keyof BodyData, keyof RangeValue]> = [
 
 trackedKeys.forEach(([key, subKey]) => {
   watch(
-    () => (tempBody.value[key] as RangeValue)[subKey],
+    () => ((bodyRef.value as any)[key] as RangeValue)[subKey],
     (v) => {
-      const entry = tempBody.value[key] as RangeValue;
+      const entry = (bodyRef.value as any)[key] as RangeValue;
       const step = entry.step;
       const snapped = roundToStep(v, step);
       if (snapped !== v) entry[subKey] = snapped;
@@ -141,19 +101,13 @@ trackedKeys.forEach(([key, subKey]) => {
   );
 });
 
-// ===== PAGINATION =====
+// PAGINATION
 const page = ref(0);
-const pageTransition = computed(
-  () => `translateX(calc(-${page.value * 100}% - ${page.value}rem))`
-);
-function goBack() {
-  if (page.value > 0) page.value--;
-}
-function goNext() {
-  if (page.value < 6) page.value++;
-}
+const pageTransition = computed(() => `translateX(calc(-${page.value * 100}% - ${page.value}rem))`);
+function goBack() { if (page.value > 0) page.value--; }
+function goNext() { if (page.value < 6) page.value++; }
 
-// ===== INPUT HELPERS =====
+// INPUT HELPERS
 function onInput(obj: any, key: string, event: Event, subKey?: string) {
   const targetObj = unwrapRef(obj);
   const entry = targetObj[key];
@@ -170,25 +124,30 @@ function onInput(obj: any, key: string, event: Event, subKey?: string) {
 }
 
 function changeActivity(val: number) {
-  tempBody.value.activity.current = val;
+  bodyRef.value.activity.current = val;
 }
-
 function changeGender(val: "Male" | "Female" | "Secret") {
-  tempBody.value.gender = val;
+  bodyRef.value.gender = val;
 }
 
-// ===== FINISH =====
+// FINISH: сохраняем body и обновляем userdata.isNew через injected user (если есть)
 async function finish() {
-  await setBodyData(toRaw(tempBody.value));
-  await setMacros(toRaw(tempMacros.value));
-  if (user && user.value) {
-    user.value.isNew = false; 
-    await setUser(toRaw(user.value));
+  await setBodyData(toRaw(bodyRef.value as any));
+  // если есть инжектed user — обновляем реф и бд
+  if (injectedUser && injectedUser.value) {
+    injectedUser.value.isNew = false;
+    await setUser(toRaw(injectedUser.value));
+  } else {
+    // если инжекта нет, можно обновить напрямую в storage (опционально)
+    const fallbackUser = await getUserData();
+    if (fallbackUser) {
+      fallbackUser.isNew = false;
+      await setUser(fallbackUser);
+    }
   }
   router.push("/dashboard");
 }
 </script>
-
 
 <template>
   <div class="bodydata">
@@ -205,16 +164,16 @@ async function finish() {
         </h3>
         <input
           type="number"
-          :min="tempBody.weight.min"
-          :max="tempBody.weight.max"
-          v-model.number="tempBody.weight.current"
-          @input="onInput(tempBody, 'weight', $event, 'current')"
+          :min="bodyRef.weight.min"
+          :max="bodyRef.weight.max"
+          v-model.number="bodyRef.weight.current"
+          @input="onInput(bodyRef, 'weight', $event, 'current')"
         />
         <CustomInput
-          v-model="tempBody.weight.current"
-          :min="tempBody.weight.min"
-          :max="tempBody.weight.max"
-          :step="tempBody.weight.step"
+          v-model="bodyRef.weight.current"
+          :min="bodyRef.weight.min"
+          :max="bodyRef.weight.max"
+          :step="bodyRef.weight.step"
           text="kg"
           :bigStep="10"
           :mod="2.2"
@@ -229,16 +188,16 @@ async function finish() {
         </h3>
         <input
           type="number"
-          :min="tempBody.weight.min"
-          :max="tempBody.weight.max"
-          v-model.number="tempBody.weight.goal"
-          @input="onInput(tempBody, 'weight', $event, 'goal')"
+          :min="bodyRef.weight.min"
+          :max="bodyRef.weight.max"
+          v-model.number="bodyRef.weight.goal"
+          @input="onInput(bodyRef, 'weight', $event, 'goal')"
         />
         <CustomInput
-          v-model="tempBody.weight.goal"
-          :min="tempBody.weight.min"
-          :max="tempBody.weight.max"
-          :step="tempBody.weight.step"
+          v-model="bodyRef.weight.goal"
+          :min="bodyRef.weight.min"
+          :max="bodyRef.weight.max"
+          :step="bodyRef.weight.step"
           text="kg"
           :bigStep="10"
           :mod="2.2"
@@ -253,9 +212,9 @@ async function finish() {
         </h3>
         <div class="gender-holder">
           <button
-            v-for="g in ['Male', 'Female', 'Secret']"
+            v-for="g in ['Male','Female','Secret']"
             :key="g"
-            :class="{ act: tempBody.gender === g }"
+            :class="{ act: bodyRef.gender === g }"
             @click="changeGender(g as any)"
           >
             {{ g }}
@@ -271,16 +230,16 @@ async function finish() {
         </h3>
         <input
           type="number"
-          :min="tempBody.height.min"
-          :max="tempBody.height.max"
-          v-model.number="tempBody.height.current"
-          @input="onInput(tempBody, 'height', $event, 'current')"
+          :min="bodyRef.height.min"
+          :max="bodyRef.height.max"
+          v-model.number="bodyRef.height.current"
+          @input="onInput(bodyRef, 'height', $event, 'current')"
         />
         <CustomInput
-          v-model="tempBody.height.current"
-          :min="tempBody.height.min"
-          :max="tempBody.height.max"
-          :step="tempBody.height.step"
+          v-model="bodyRef.height.current"
+          :min="bodyRef.height.min"
+          :max="bodyRef.height.max"
+          :step="bodyRef.height.step"
           text="cm"
           :bigStep="10"
           :mod="10"
@@ -295,16 +254,16 @@ async function finish() {
         </h3>
         <input
           type="number"
-          :min="tempBody.age.min"
-          :max="tempBody.age.max"
-          v-model.number="tempBody.age.current"
-          @input="onInput(tempBody, 'age', $event, 'current')"
+          :min="bodyRef.age.min"
+          :max="bodyRef.age.max"
+          v-model.number="bodyRef.age.current"
+          @input="onInput(bodyRef, 'age', $event, 'current')"
         />
         <CustomInput
-          v-model="tempBody.age.current"
-          :min="tempBody.age.min"
-          :max="tempBody.age.max"
-          :step="tempBody.age.step"
+          v-model="bodyRef.age.current"
+          :min="bodyRef.age.min"
+          :max="bodyRef.age.max"
+          :step="bodyRef.age.step"
           text="years"
           :bigStep="10"
           :mod="1"
@@ -319,32 +278,31 @@ async function finish() {
         </h3>
         <div class="active-holder">
           <button
-            v-for="value in tempBody.activity.all"
+            v-for="value in bodyRef.activity.all"
             :key="value.text"
             @click="changeActivity(value.val)"
-            :class="{ act: value.val === tempBody.activity.current }"
+            :class="{ act: value.val === bodyRef.activity.current }"
           >
             {{ value.text }}
           </button>
         </div>
       </div>
 
-      <!-- RESULTS -->
+      <!-- RESULTS (берём макросы из provide/inject) -->
       <div class="page" :style="{ transform: pageTransition }">
-        <h3>
-          <span>Here’s what we think</span>
-        </h3>
+        <h3><span>Here’s what we think</span></h3>
+
         <p>Maintain weight:</p>
-        <p>{{ tempMacros.maintain.kcal }} kcal</p>
-        <p>P: {{ tempMacros.maintain.proteins }}g</p>
-        <p>F: {{ tempMacros.maintain.fats }}g</p>
-        <p>C: {{ tempMacros.maintain.carbs }}g</p>
+        <p>{{ macrosRef.maintain.kcal }} kcal</p>
+        <p>P: {{ macrosRef.maintain.proteins }}g</p>
+        <p>F: {{ macrosRef.maintain.fats }}g</p>
+        <p>C: {{ macrosRef.maintain.carbs }}g</p>
 
         <p>Goal adjustment:</p>
-        <p>{{ tempMacros.modify.kcal }} kcal</p>
-        <p>P: {{ tempMacros.modify.proteins }}g</p>
-        <p>F: {{ tempMacros.modify.fats }}g</p>
-        <p>C: {{ tempMacros.modify.carbs }}g</p>
+        <p>{{ macrosRef.modify.kcal }} kcal</p>
+        <p>P: {{ macrosRef.modify.proteins }}g</p>
+        <p>F: {{ macrosRef.modify.fats }}g</p>
+        <p>C: {{ macrosRef.modify.carbs }}g</p>
       </div>
     </div>
 

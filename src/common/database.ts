@@ -32,6 +32,7 @@ export interface ActivityLevel {
   val: number;
 }
 export interface Macros {
+  weight: number;
   kcal: number;
   proteins: number;
   fats: number;
@@ -40,12 +41,6 @@ export interface Macros {
 export interface UserMacros {
   maintain: Macros;
   modify: Macros;
-}
-export async function getMacrosData(): Promise<UserMacros | null> {
-  return await localforage.getItem<UserMacros>("usermacros");
-}
-export async function setMacros(data: UserMacros): Promise<void> {
-  await localforage.setItem("usermacros", data);
 }
 
 //
