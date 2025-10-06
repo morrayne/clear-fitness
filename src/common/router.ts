@@ -10,7 +10,7 @@ const routes = [
   { path: "/", redirect: "/dashboard" },
   { path: "/dashboard", component: Dashboard },
   { path: "/bodydata", component: BodyData },
-  { path: "/foodbase", component: FoodBase },
+  { path: "/addrecord", component: FoodBase },
   { path: "/intakes", component: Intakes },
   { path: "/settings", component: Settings },
   { path: "/nameform", component: Nameform },

@@ -195,6 +195,21 @@ body {
 .header-wrapper header .router-link-active {
   opacity: 1;
 }
+.header-wrapper header .plus {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: var(--main-bg);
+  opacity: 1;
+  filter: invert(var(--svg-invert));
+  margin: auto 0;
+}
+.header-wrapper header .plus img {
+  scale: 1.5;
+}
 
 .nameform {
   width: 100%;

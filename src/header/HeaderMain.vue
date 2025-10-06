@@ -7,16 +7,17 @@ const user = inject<Ref<UserData | null>>("userdata");
 
 interface HeaderButtonType {
   text: string;
+  textDisplay: boolean;
   svg: string;
   path: string;
 }
 
 const HeaderData: HeaderButtonType[] = [
-  { text: "Dashboard", svg: "/svg/header/dashboard.svg", path: "/dashboard" },
-  { text: "Food Base", svg: "/svg/header/foodbase.svg", path: "/foodbase" },
-  { text: "Intakes", svg: "/svg/header/intakes.svg", path: "/intakes" },
-  { text: "Body Data", svg: "/svg/header/bodydata.svg", path: "/bodydata" },
-  { text: "Settings", svg: "/svg/header/settings.svg", path: "/settings" },
+  { text: "Dashboard", textDisplay: true, svg: "/svg/header/dashboard.svg", path: "/dashboard" },
+  { text: "Intakes", textDisplay: true, svg: "/svg/header/intakes.svg", path: "/intakes" },
+  { text: "Add Record", textDisplay: false, svg: "/svg/header/plus.svg", path: "/addrecord" },
+  { text: "Body Data", textDisplay: true, svg: "/svg/header/bodydata.svg", path: "/bodydata" },
+  { text: "Settings", textDisplay: true, svg: "/svg/header/settings.svg", path: "/settings" },
 ];
 </script>
 
