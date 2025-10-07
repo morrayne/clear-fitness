@@ -56,8 +56,9 @@ ol {
   /* text */
   --main-text: #fffffe;
   --sub-text: #69686a;
+  --extra-text: #5c5c5c;
   /* header */
-  --header-height: 80px;
+  --header-height: 5rem;
   --header-border: #323232;
   /* extras */
   --sub-accent: #e5eefe;
@@ -160,6 +161,7 @@ body {
 .header-wrapper {
   width: 100%;
   position: fixed;
+  z-index: 1000;
   bottom: 0;
   left: 0;
   display: flex;
@@ -170,6 +172,7 @@ body {
   height: var(--header-height);
   max-width: 1280px;
   border-top: solid 2px var(--header-border);
+  background: var(--sub-bg);
   padding: 0.5rem;
   display: flex;
   justify-content: space-between;
@@ -180,15 +183,16 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   opacity: 0.6;
 }
 .header-wrapper header .header-link img {
-  height: calc(100% - 21px - 4px);
+  height: calc(100% - 21px - 4px - 12px);
   filter: invert(var(--svg-invert));
 }
 .header-wrapper header .header-link p {
-  font-size: 14px;
+  font-size: 12px;
   white-space: nowrap;
   color: var(--main-text);
 }
@@ -208,7 +212,7 @@ body {
   margin: auto 0;
 }
 .header-wrapper header .plus img {
-  scale: 1.5;
+  scale: 2;
 }
 
 .nameform {
@@ -442,4 +446,157 @@ body {
 }
 .bodydata .bodydata-main .page .gender-holder .act {
   outline: solid 3px var(--main-accent);
+}
+
+.intakes {
+  height: 100%;
+  padding: 0 0 var(--header-height);
+  display: flex;
+  flex-direction: column;
+}
+.intakes .top {
+  height: -moz-fit-content;
+  height: fit-content;
+  background: var(--sub-bg);
+  padding: 1rem;
+}
+.intakes .top .goals {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+.intakes .top .goals .item {
+  display: flex;
+  flex-direction: column;
+}
+.intakes .top .weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+.intakes .top .weekdays .day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--extra-bg);
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-radius: 4rem;
+}
+.intakes .bot {
+  height: 100%;
+  display: flex;
+  overflow-x: hidden;
+}
+.intakes .bot .page {
+  min-width: 100%;
+  height: 100%;
+  padding: 1rem;
+}
+.intakes .bot .page h2 {
+  font-size: 18px;
+}
+
+.addrecord {
+  width: 100%;
+  height: 100%;
+  padding: 0 0 calc(var(--header-height) + 3rem);
+}
+.addrecord .record-nav {
+  width: 100%;
+  height: 3rem;
+  position: fixed;
+  bottom: var(--header-height);
+  background: var(--sub-bg);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.addrecord .record-nav button {
+  border-top: solid 2px var(--header-border);
+}
+.addrecord .record-nav .act {
+  border-top: solid 2px var(--main-text);
+}
+.addrecord .pages {
+  height: 100%;
+  display: flex;
+}
+.addrecord .pages .page {
+  min-width: 100%;
+  height: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  transition: 0.4s;
+}
+.addrecord .pages .page .input-holder {
+  display: flex;
+  flex-direction: column;
+  background: var(--sub-bg);
+  border-radius: 0.5rem;
+  padding: 0.8rem;
+  gap: 1rem;
+}
+.addrecord .pages .page .input-holder input {
+  width: 100%;
+  color: var(--main-text);
+  background: var(--extra-bg);
+  border: none;
+  border-radius: 0.5rem;
+  outline: none;
+  padding: 0.5rem 1rem;
+}
+.addrecord .pages .page .input-holder .bju {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.addrecord .pages .page .input-holder .addasset {
+  padding: 0.5rem 1rem;
+  background: var(--main-text);
+  color: var(--main-bg);
+  border-radius: 0.6rem;
+}
+.addrecord .pages .page .food-item {
+  width: 100%;
+  background: var(--sub-bg);
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  display: flex;
+  gap: 1rem;
+}
+.addrecord .pages .page .food-item .left {
+  height: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  background: var(--extra-bg);
+}
+.addrecord .pages .page .food-item .right {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.addrecord .pages .page .food-item .right .name {
+  display: flex;
+  gap: 2rem;
+}
+.addrecord .pages .page .food-item .right .name button {
+  margin-left: auto;
+  height: 1.5rem;
+  aspect-ratio: 1/1;
+  background: var(--extra-bg);
+  border-radius: 0.4rem;
+}
+.addrecord .pages .page .food-item .right .name button img {
+  width: 100%;
+  height: 100%;
+  filter: invert(var(--svg-invert));
+}
+.addrecord .pages .page .food-item .right .info {
+  display: flex;
+  gap: 1rem;
+}
+.addrecord .pages .page .food-item .right .info p {
+  color: var(--sub-text);
 }/*# sourceMappingURL=main.css.map */

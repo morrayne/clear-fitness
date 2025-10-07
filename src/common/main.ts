@@ -2,9 +2,58 @@ import { createApp, ref, computed } from "vue";
 import App from "../App.vue";
 import router from "./router";
 import "../scss/main.css";
+import localforage from "localforage";
 
-import { getUserData, setUser, type UserData } from "./database";
-import { getBodyData, setBodyData, type BodyData } from "./database";
+import {
+  getUserData,
+  setUser,
+  type UserData,
+  getBodyData,
+  setBodyData,
+  type BodyData,
+  foodDB,
+  type FoodDatabase,
+} from "./database";
+
+// === ФУНКЦИЯ СОХРАНЕНИЯ БАЗЫ ===
+async function saveFoodDB(data: FoodDatabase) {
+  await localforage.setItem("foodDatabase", data);
+  Object.assign(foodDB.value, data); // сохраняем реактивно
+}
+
+// === ФУНКЦИЯ ЗАГРУЗКИ БАЗЫ ===
+async function loadFoodDB() {
+  const stored = await localforage.getItem<FoodDatabase>("foodDatabase");
+  if (stored) {
+    Object.assign(foodDB.value, stored);
+  } else {
+    const defaultDB: FoodDatabase = {
+      default: [
+        {
+          id: "1",
+          name: "Chicken breast",
+          calories: 165,
+          protein: 31,
+          carbs: 0,
+          fat: 3.6,
+          portionSize: 100,
+        },
+        {
+          id: "2",
+          name: "Rice (boiled)",
+          calories: 130,
+          protein: 2.7,
+          carbs: 28,
+          fat: 0.3,
+          portionSize: 100,
+        }
+      ],
+      custom: [],
+    };
+    await localforage.setItem("foodDatabase", defaultDB);
+    Object.assign(foodDB.value, defaultDB);
+  }
+}
 
 async function bootstrap() {
   // === USER ===
@@ -39,6 +88,10 @@ async function bootstrap() {
   }
   const bodyRef = ref<BodyData>(userbody);
 
+  // === FOOD DATABASE ===
+  await loadFoodDB();
+  const foodRef = ref(foodDB.value);
+
   // === COMPUTED MACROS ===
   const usermacros = computed(() => {
     const { weight, height, age, gender, activity } = bodyRef.value;
@@ -56,21 +109,20 @@ async function bootstrap() {
     const maintain = {
       weight: currentWeight,
       kcal: Math.round(TDEE),
-      proteins: +(currentWeight * 1.6).toFixed(1), // базовый белок 1.6 г/кг
+      proteins: +(currentWeight * 1.6).toFixed(1),
       fats: +((TDEE * 0.25) / 9).toFixed(1),
       carbs: +((TDEE * 0.5) / 4).toFixed(1),
     };
 
     // === Корректировка для достижения цели ===
-    const weightDiff = goalWeight - currentWeight; // кг
+    const weightDiff = goalWeight - currentWeight;
     if (weightDiff === 0) {
       return { maintain, modify: { ...maintain, weight: goalWeight } };
     }
 
-    const daysToChange = (Math.abs(weightDiff) / 2) * 30; // 2 кг = 1 месяц, 30 дней в месяце
-    const muscleRatio = 0.5; // 50% мышц, 50% жира
+    const daysToChange = (Math.abs(weightDiff) / 2) * 30;
+    const muscleRatio = 0.5;
 
-    // Дневная калорийная корректировка
     const deltaCalories =
       (weightDiff * muscleRatio * 2500 +
         weightDiff * (1 - muscleRatio) * 7700) /
@@ -78,8 +130,7 @@ async function bootstrap() {
 
     const modifyTDEE = TDEE + deltaCalories;
 
-    // Расчёт макросов
-    const proteinPerKg = 2; // 2 г белка на кг для набора
+    const proteinPerKg = 2;
     const proteinKcal = proteinPerKg * currentWeight * 4;
     const fatKcal = modifyTDEE * 0.25;
     const carbKcal = modifyTDEE - proteinKcal - fatKcal;
@@ -100,6 +151,8 @@ async function bootstrap() {
   app.provide("userdata", userRef);
   app.provide("userbody", bodyRef);
   app.provide("usermacros", usermacros);
+  app.provide("foodDB", foodRef);
+  app.provide("saveFoodDB", saveFoodDB);
   app.use(router);
   app.mount("#app");
 

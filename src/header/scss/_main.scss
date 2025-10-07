@@ -1,6 +1,7 @@
 .header-wrapper {
   width: 100%;
   position: fixed;
+  z-index: 1000;
   bottom: 0;
   left: 0;
   display: flex;
@@ -11,6 +12,7 @@
     height: var(--header-height);
     max-width: 1280px;
     border-top: solid 2px var(--header-border);
+    background: var(--sub-bg);
     padding: 0.5rem;
     display: flex;
     justify-content: space-between;
@@ -21,16 +23,17 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 4px;
       opacity: 0.6;
 
       img {
-        height: calc(100% - 21px - 4px);
+        height: calc(100% - 21px - 4px - 12px);
         filter: invert(var(--svg-invert));
       }
 
       p {
-        font-size: 14px;
+        font-size: 12px;
         white-space: nowrap;
         color: var(--main-text);
       }
@@ -51,7 +54,7 @@
       margin: auto 0;
 
       img {
-        scale: 1.5;
+        scale: 2;
       }
     }
   }

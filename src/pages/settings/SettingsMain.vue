@@ -1,3 +1,5 @@
 <script setup lang="ts"></script>
 
-<template></template>
+<template>
+    <img src="../../../public/gif/evernight.gif"></img>
+</template>

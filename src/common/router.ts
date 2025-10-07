@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../pages/dashboard/DashboardMain.vue";
 import BodyData from "../pages/bodydata/BodyDataMain.vue";
-import FoodBase from "../pages/foodbase/FoodbaseMain.vue";
+import FoodBase from "../pages/addrecord/FoodbaseMain.vue";
 import Intakes from "../pages/intakes/IntakesMain.vue";
 import Settings from "../pages/settings/SettingsMain.vue";
 import Nameform from "../pages/nameform/NameformMain.vue";
