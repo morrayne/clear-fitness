@@ -7,13 +7,12 @@ import localforage from "localforage";
 import {
   getUserData,
   setUser,
-  type UserData,
   getBodyData,
   setBodyData,
-  type BodyData,
   foodDB,
-  type FoodDatabase,
 } from "./database";
+
+import type { UserData, BodyData, FoodDatabase } from "./types";
 
 // === ФУНКЦИЯ СОХРАНЕНИЯ БАЗЫ ===
 async function saveFoodDB(data: FoodDatabase) {

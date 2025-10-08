@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, type ComputedRef } from "vue";
-import type { UserMacros } from "../../common/database";
+import type { UserMacros } from "../../common/types";
 
 // Получаем вычисленные макросы из provide
 const macros = inject<ComputedRef<UserMacros>>("usermacros");

@@ -464,6 +464,7 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
+  margin: 0 0 0.5rem;
 }
 .intakes .top .goals .item {
   display: flex;
@@ -483,6 +484,9 @@ body {
   padding: 0.5rem 0;
   border-radius: 4rem;
 }
+.intakes .top .weekdays .active {
+  outline: solid 2px var(--main-text);
+}
 .intakes .bot {
   height: 100%;
   display: flex;
@@ -495,6 +499,17 @@ body {
 }
 .intakes .bot .page h2 {
   font-size: 18px;
+}
+.intakes .bot .page .march-holder {
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.intakes .bot .page .march-holder img {
+  max-width: 15rem;
+  margin: 0 0 1rem;
 }
 
 .addrecord {
@@ -529,6 +544,33 @@ body {
   flex-direction: column;
   transition: 0.4s;
 }
+.addrecord .pages .page h3 {
+  font-size: 24px;
+}
+.addrecord .pages .page .finish {
+  width: 100%;
+  padding: 0.4rem 0;
+  background: var(--main-text);
+  color: var(--main-bg);
+  font-weight: 700;
+  border-radius: 0.5rem;
+  margin: 1rem 0 0.5rem;
+}
+.addrecord .pages .page .nothingYet {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.addrecord .pages .page .nothingYet img {
+  max-width: 15rem;
+}
+.addrecord .pages .page .nothingYet p {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
 .addrecord .pages .page .input-holder {
   display: flex;
   flex-direction: column;
@@ -557,46 +599,49 @@ body {
   color: var(--main-bg);
   border-radius: 0.6rem;
 }
-.addrecord .pages .page .food-item {
+
+.food-item {
   width: 100%;
   background: var(--sub-bg);
   margin-top: 0.5rem;
   padding: 0.5rem;
   display: flex;
   gap: 1rem;
+  border-radius: 0.8rem;
 }
-.addrecord .pages .page .food-item .left {
+.food-item .left {
   height: 100%;
+  min-height: 3rem;
   aspect-ratio: 1/1;
   border-radius: 50%;
   background: var(--extra-bg);
 }
-.addrecord .pages .page .food-item .right {
+.food-item .right {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
-.addrecord .pages .page .food-item .right .name {
+.food-item .right .name {
   display: flex;
   gap: 2rem;
 }
-.addrecord .pages .page .food-item .right .name button {
+.food-item .right .name button {
   margin-left: auto;
   height: 1.5rem;
   aspect-ratio: 1/1;
   background: var(--extra-bg);
   border-radius: 0.4rem;
 }
-.addrecord .pages .page .food-item .right .name button img {
+.food-item .right .name button img {
   width: 100%;
   height: 100%;
   filter: invert(var(--svg-invert));
 }
-.addrecord .pages .page .food-item .right .info {
+.food-item .right .info {
   display: flex;
   gap: 1rem;
 }
-.addrecord .pages .page .food-item .right .info p {
+.food-item .right .info p {
   color: var(--sub-text);
 }/*# sourceMappingURL=main.css.map */

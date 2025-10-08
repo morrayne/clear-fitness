@@ -1,13 +1,6 @@
 <script setup lang="ts">
-const props = defineProps<{
-  kcal: number;
-  portionSize: number;
-  carbs: number;
-  fats: number;
-  proteins: number;
-  name: string;
-  deleteBtn: boolean;
-}>();
+import type { FoodItemProps } from "../../../common/types";
+const props = defineProps<FoodItemProps>();
 </script>
 
 <template>
@@ -22,7 +15,7 @@ const props = defineProps<{
         </button>
       </div>
       <div class="info">
-        <p>{{ props.kcal }} kacl</p>
+        <p>{{ props.kcal }} kcal</p>
         <p>{{ props.proteins }} p</p>
         <p>{{ props.carbs }} c</p>
         <p>{{ props.fats }} f</p>

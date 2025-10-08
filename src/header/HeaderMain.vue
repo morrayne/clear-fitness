@@ -1,17 +1,9 @@
 <script setup lang="ts">
 import { inject, type Ref } from "vue";
-import type { UserData } from "../common/database";
+import type { UserData, HeaderButtonType } from "../common/types";
 import HeaderButton from "./components/button.vue";
 
 const user = inject<Ref<UserData | null>>("userdata");
-
-interface HeaderButtonType {
-  text: string;
-  textDisplay: boolean;
-  svg: string;
-  path: string;
-}
-
 const HeaderData: HeaderButtonType[] = [
   { text: "Dashboard", textDisplay: true, svg: "/svg/header/dashboard.svg", path: "/dashboard" },
   { text: "Intakes", textDisplay: true, svg: "/svg/header/intakes.svg", path: "/intakes" },

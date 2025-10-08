@@ -1,29 +1,23 @@
 <script setup lang="ts">
-import type { RangeValue, ActivityLevel, UserData, UserMacros, BodyData as DBBodyData } from "../../common/database";
+import type {
+  RangeValue,
+  UserData,
+  UserMacros,
+  BodyData, // просто импортируем теперь
+} from "../../common/types";
 import { ref, watch, computed, onMounted, toRaw, inject, type Ref, type ComputedRef } from "vue";
 import { getBodyData, setBodyData, setUser, getUserData } from "../../common/database";
 import CustomInput from "./components/customInput.vue";
 import { useRouter } from "vue-router";
+
 
 // ROUTER
 const router = useRouter();
 
 // INJECT (может быть undefined — делаем fallback)
 const injectedUser = inject<Ref<UserData | null>>("userdata");
-const injectedBody = inject<Ref<DBBodyData> | null>("userbody");
+const injectedBody = inject<Ref<BodyData> | null>("userbody");
 const injectedMacros = inject<ComputedRef<UserMacros> | null>("usermacros");
-
-// TYPES
-interface BodyData {
-  gender: "Male" | "Female" | "Secret";
-  age: RangeValue;
-  height: RangeValue;
-  weight: RangeValue;
-  activity: {
-    current: number;
-    all: ActivityLevel[];
-  };
-}
 
 // Если провайдера нет — локальный реф (фолбек)
 const localBody = ref<BodyData>({

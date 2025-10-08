@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, inject, type Ref } from "vue";
 import { useRouter } from "vue-router";
-import { setUser, type UserData } from "../../common/database";
+import { setUser } from "../../common/database";
+import type { UserData } from "../../common/types"
 
 const router = useRouter();
 const userRef = inject<Ref<UserData>>("userdata");

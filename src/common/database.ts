@@ -1,92 +1,45 @@
 import localforage from "localforage";
+import { ref } from "vue";
+import type {
+  UserData,
+  BodyData,
+  FoodItem,
+  FoodDatabase,
+  DailyEntry,
+} from "./types";
 
+// === LOCALFORAGE SETTINGS ===
 localforage.config({
   name: "Clear-fitness-db",
   storeName: "main-storage",
 });
 
-// =====================
 // === BASE USER INFO ===
-// =====================
-export interface UserData {
-  userName: string;
-  isNew: boolean;
-}
+
 export async function getUserData(): Promise<UserData | null> {
   return await localforage.getItem<UserData>("userdata");
 }
+
 export async function setUser(data: UserData): Promise<void> {
   await localforage.setItem("userdata", data);
 }
+
 export async function clearUser(): Promise<void> {
   await localforage.removeItem("userdata");
 }
 
-// ======================
 // === BODY USER INFO ===
-// ======================
-export interface RangeValue {
-  min: number;
-  max: number;
-  step: number;
-  current: number;
-  goal: number;
-}
-export interface ActivityLevel {
-  text: string;
-  val: number;
-}
-export interface Macros {
-  weight: number;
-  kcal: number;
-  proteins: number;
-  fats: number;
-  carbs: number;
-}
-export interface UserMacros {
-  maintain: Macros;
-  modify: Macros;
-}
-
-export interface BodyData {
-  gender: "Male" | "Female" | "Secret";
-  age: RangeValue;
-  height: RangeValue;
-  weight: RangeValue;
-  activity: {
-    current: number;
-    all: ActivityLevel[];
-  };
-}
 
 export async function getBodyData(): Promise<BodyData | null> {
   return await localforage.getItem<BodyData>("userbody");
 }
+
 export async function setBodyData(data: BodyData): Promise<void> {
   await localforage.setItem("userbody", data);
 }
 
-// =====================
 // === FOOD DATABASE ===
-// =====================
-import { ref } from "vue";
 
-export interface FoodItem {
-  id: string;
-  name: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  portionSize: number; // граммы, 100 по умолчанию
-}
-
-export interface FoodDatabase {
-  default: FoodItem[];
-  custom: FoodItem[];
-}
-
-// === Базовые продукты ===
 const defaultFoods: FoodItem[] = [
   {
     id: "1",
@@ -117,21 +70,20 @@ const defaultFoods: FoodItem[] = [
   },
 ];
 
-// === РЕАКТИВНОЕ ХРАНИЛИЩЕ ===
-export const foodDB = ref<FoodDatabase>({ default: defaultFoods, custom: [] });
+export const foodDB = ref<FoodDatabase>({
+  default: defaultFoods,
+  custom: [],
+});
 
-// === Загрузка и сохранение ===
 export async function loadFoodDB() {
   try {
     const stored = await localforage.getItem<FoodDatabase>("foodDatabase");
     if (stored) {
-      // Используем Object.assign для избежания реактивных проблем
-      foodDB.value.default = stored.default
+      foodDB.value.default = stored.default?.length
         ? [...stored.default]
         : [...defaultFoods];
       foodDB.value.custom = stored.custom ? [...stored.custom] : [];
     } else {
-      // Сохраняем начальные данные
       const initialDB: FoodDatabase = {
         default: [...defaultFoods],
         custom: [],
@@ -141,7 +93,6 @@ export async function loadFoodDB() {
     return foodDB;
   } catch (error) {
     console.error("Error loading food database:", error);
-    // Возвращаем значения по умолчанию при ошибке
     foodDB.value.default = [...defaultFoods];
     foodDB.value.custom = [];
     return foodDB;
@@ -150,7 +101,6 @@ export async function loadFoodDB() {
 
 export async function saveFoodDB() {
   try {
-    // Создаем глубокую копию без реактивных свойств
     const simpleDB: FoodDatabase = {
       default: JSON.parse(JSON.stringify(foodDB.value.default)),
       custom: JSON.parse(JSON.stringify(foodDB.value.custom)),
@@ -162,11 +112,8 @@ export async function saveFoodDB() {
   }
 }
 
-// === Добавление ===
 export async function addCustomFood(food: Omit<FoodItem, "id">) {
   const id = Date.now().toString();
-
-  // Создаем чистый объект продукта
   const newFood: FoodItem = {
     id,
     name: food.name.trim(),
@@ -176,14 +123,58 @@ export async function addCustomFood(food: Omit<FoodItem, "id">) {
     fat: Math.round(food.fat * 100) / 100,
     portionSize: food.portionSize,
   };
-
   foodDB.value.custom.push(newFood);
   await saveFoodDB();
   return newFood;
 }
 
-// === Удаление ===
 export async function removeCustomFood(id: string) {
   foodDB.value.custom = foodDB.value.custom.filter((f) => f.id !== id);
   await saveFoodDB();
+}
+
+// === DAILY MEALS STORAGE ===
+
+export async function addDailyEntry(entry: DailyEntry) {
+  if (!entry || !entry.date) {
+    throw new Error("addDailyEntry: entry.date is required");
+  }
+
+  const cleanEntry: DailyEntry = {
+    date: entry.date,
+    foods: JSON.parse(JSON.stringify(entry.foods || [])),
+    macros: { ...entry.macros },
+  };
+
+  // получаем существующие дневные записи
+  const allEntries =
+    (await localforage.getItem<Record<string, DailyEntry[]>>("dailyEntries")) ||
+    {};
+
+  const existing = allEntries[cleanEntry.date] || [];
+  existing.push(cleanEntry);
+  allEntries[cleanEntry.date] = existing;
+
+  await localforage.setItem("dailyEntries", allEntries);
+}
+
+export async function getDailyEntries(date: string): Promise<DailyEntry[]> {
+  const allEntries =
+    (await localforage.getItem<Record<string, DailyEntry[]>>("dailyEntries")) ||
+    {};
+  return allEntries[date] || [];
+}
+
+export async function clearDailyEntries(date?: string) {
+  const allEntries =
+    (await localforage.getItem<Record<string, DailyEntry[]>>("dailyEntries")) ||
+    {};
+
+  if (date) {
+    delete allEntries[date];
+  } else {
+    Object.keys(allEntries).forEach((k) => delete allEntries[k]);
+  }
+
+  await localforage.setItem("dailyEntries", allEntries);
 }

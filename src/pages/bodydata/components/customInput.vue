@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-
-interface ScaleProps {
-  min: number;
-  max: number;
-  step: number;
-  mod: number;
-  text: string;
-  modelValue: number;
-  bigStep: number;
-}
+import type { ScaleProps } from '../../../common/types'
 
 const props = withDefaults(defineProps<ScaleProps>(), {});
 const emit = defineEmits(["update:modelValue"]);

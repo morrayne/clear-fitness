@@ -13,6 +13,7 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
+      margin: 0 0 0.5rem;
 
       .item {
         display: flex;
@@ -34,6 +35,10 @@
         padding: 0.5rem 0;
         border-radius: 4rem;
       }
+
+      .active {
+        outline: solid 2px var(--main-text);
+      }
     }
   }
 
@@ -49,6 +54,19 @@
 
       h2 {
         font-size: 18px;
+      }
+
+      .march-holder {
+        height: 90%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        img {
+          max-width: 15rem;
+          margin: 0 0 1rem;
+        }
       }
     }
   }
