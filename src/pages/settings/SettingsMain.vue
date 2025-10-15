@@ -1,5 +1,8 @@
 <script setup lang="ts"></script>
 
 <template>
-    <img src="../../../public/gif/evernight.gif"></img>
+  <div class="settings">
+    <img src="../../../public/gif/evernight.gif" />
+    <h2>Ts is test app so no settings</h2>
+  </div>
 </template>

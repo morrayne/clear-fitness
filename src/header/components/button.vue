@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import type { HeaderLinkData } from "../../common/types";
-
 const props = defineProps<{
-  data: HeaderLinkData;
+  data: {
+    text: string;
+    textDisplay: boolean;
+    svg: string;
+    path: string;
+  };
 }>();
 </script>
 

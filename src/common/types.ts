@@ -1,115 +1,79 @@
-// types.ts
-
-export interface UserData {
-  userName: string;
-  isNew: boolean;
+export interface TypeDefaultConfig {
+  general: {
+    name: string;
+    lang: string;
+    isNew: boolean;
+  };
+  weight: {
+    min: number;
+    max: number;
+    step: number;
+    bigStep: number;
+    text: string;
+    textAlt: string;
+    mod: number;
+  };
+  height: {
+    min: number;
+    max: number;
+    step: number;
+    bigStep: number;
+    text: string;
+    textAlt: string;
+    mod: number;
+  };
+  age: {
+    min: number;
+    max: number;
+    step: number;
+    bigStep: number;
+    text: string;
+    mod: number;
+  };
+  bf: {
+    min: number;
+    max: number;
+    step: number;
+    bigStep: number;
+    text: string;
+    mod: number;
+  };
+  activity: number[];
+  gender: number[];
+  accuracy: string[];
 }
 
-export interface RangeValue {
-  min: number;
-  max: number;
-  step: number;
-  current: number;
-  goal: number;
+export interface TypeDefaultBody {
+  currentWeight: number;
+  goalWeight: number;
+  goalBF: number;
+  height: number;
+  gender: number;
+  age: number;
+  activity: number;
+  accuracy: "Normal" | "Athletic";
 }
 
-export interface ActivityLevel {
-  text: string;
-  val: number;
+export interface TypeFood {
+  id: string | number;
+  name: string;
+  portionSize: number;
+  proteins: number;
+  carbs: number;
+  fats: number;
+  kcal: number;
 }
 
-export interface Macros {
+export interface TypeMacro {
   weight: number;
+  bf: number;
   kcal: number;
   proteins: number;
   fats: number;
   carbs: number;
 }
 
-export interface UserMacros {
-  maintain: Macros;
-  modify: Macros;
-}
-
-export interface BodyData {
-  gender: "Male" | "Female" | "Secret";
-  age: RangeValue;
-  height: RangeValue;
-  weight: RangeValue;
-  activity: {
-    current: number;
-    all: ActivityLevel[];
-  };
-}
-
-export interface FoodItem {
-  id: string;
-  name: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  portionSize: number;
-}
-
-export interface FoodDatabase {
-  default: FoodItem[];
-  custom: FoodItem[];
-}
-
-export interface DailyEntry {
-  date: string; // "YYYY-MM-DD"
-  foods: FoodItem[];
-  macros: {
-    kcal: number;
-    proteins: number;
-    fats: number;
-    carbs: number;
-  };
-}
-
-export interface HeaderButtonType {
-  text: string;
-  textDisplay: boolean;
-  svg: string;
-  path: string;
-}
-
-export interface HeaderLinkData {
-  path: string;
-  svg: string;
-  text: string;
-  textDisplay: boolean;
-}
-
-
-export interface FoodItemProps {
-  kcal: number;
-  portionSize: number;
-  carbs: number;
-  fats: number;
-  proteins: number;
-  name: string;
-  deleteBtn: boolean;
-}
-
-export interface ScaleProps {
-  min: number;
-  max: number;
-  step: number;
-  mod: number;
-  text: string;
-  modelValue: number;
-  bigStep: number;
-}
-
-export interface BodyData {
-  gender: "Male" | "Female" | "Secret";
-  age: RangeValue;
-  height: RangeValue;
-  weight: RangeValue;
-  activity: {
-    current: number;
-    all: ActivityLevel[];
-  };
+export interface TypeMacroResult {
+  maintain: TypeMacro;
+  modify: TypeMacro;
 }

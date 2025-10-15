@@ -1,106 +1,79 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import FoodItemComponent from "../addrecord/components/FoodItemComponent.vue";
-import { getDailyEntries } from "../../common/database";
-import type { DailyEntry, FoodItem } from "../../common/types";
+import { ref, computed } from "vue";
+import localforage from "localforage";
+import weekmain from "../../week/weekmain.vue";
+import fooditem from "../addrecord/components/FoodItemComponent.vue";
+import type { TypeFood } from "../../common/types";
 
-// Сегодняшняя дата
-const today = new Date();
-const selectedDate = ref(today.toISOString().slice(0, 10));
+interface Intake {
+  date: string;
+  foods: TypeFood[];
+}
 
-// Генерация недели с понедельника до воскресенья
-const weekData = computed(() => {
-  const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ...
-  // вычисляем смещение до понедельника
-  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  const monday = new Date(today);
-  monday.setDate(today.getDate() + mondayOffset);
+const selectedDate = ref<string>("");
+const dayFoods = ref<TypeFood[]>([]);
 
-  const arr = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    arr.push({
-      text: d.toLocaleDateString("en-US", { weekday: "short" }).charAt(0), // M, T, W...
-      day: d.getDate(),
-      fullDate: d.toISOString().slice(0, 10),
-    });
+// === вычисляемые суммарные данные ===
+const dayTotals = computed(() => {
+  if (!dayFoods.value.length) {
+    return { kcal: 0, proteins: 0, fats: 0, carbs: 0 };
   }
-  return arr;
-});
-
-// Продукты выбранного дня
-const dayFoods = ref<FoodItem[]>([]);
-const dayMacros = ref({ kcal: 0, proteins: 0, fats: 0, carbs: 0 });
-
-async function loadDay(date: string) {
-  selectedDate.value = date;
-  const entries: DailyEntry[] = await getDailyEntries(date);
-  const foods: FoodItem[] = entries.flatMap((e) => e.foods);
-  dayFoods.value = foods;
-
-  // Суммируем макросы
-  const macros = foods.reduce(
-    (acc, f) => {
-      acc.kcal += f.calories;
-      acc.proteins += f.protein;
-      acc.fats += f.fat;
-      acc.carbs += f.carbs;
+  return dayFoods.value.reduce(
+    (acc, food) => {
+      acc.kcal += food.kcal;
+      acc.proteins += food.proteins;
+      acc.fats += food.fats;
+      acc.carbs += food.carbs;
       return acc;
     },
     { kcal: 0, proteins: 0, fats: 0, carbs: 0 }
   );
-  dayMacros.value = macros;
+});
+
+// === обработка выбора даты ===
+async function handleDateSelected(date: string) {
+  selectedDate.value = date;
+
+  const allIntakes = (await localforage.getItem<Intake[]>("userintakes")) || [];
+  const found = allIntakes.find((entry) => entry.date === date);
+
+  if (found && found.foods?.length) {
+    dayFoods.value = found.foods;
+  } else {
+    dayFoods.value = [];
+  }
 }
 
-// Загружаем сегодня при монтировании
-onMounted(() => loadDay(selectedDate.value));
+// === удаление блюда ===
+async function handleRemoveFood(id: string | number) {
+  if (!selectedDate.value) return;
+  const allIntakes = (await localforage.getItem<Intake[]>("userintakes")) || [];
+  const found = allIntakes.find((entry) => entry.date === selectedDate.value);
+  if (found) {
+    const index = found.foods.findIndex((food) => food.id === id);
+    if (index !== -1) found.foods.splice(index, 1);
+
+    dayFoods.value = [...found.foods];
+    await localforage.setItem("userintakes", allIntakes);
+  }
+}
 </script>
 
 <template>
-  <div class="intakes">
-    <div class="top">
-      <div class="goals">
-        <div class="item">{{ dayMacros.kcal }}</div>
-        <div class="item">{{ dayMacros.proteins }}</div>
-        <div class="item">{{ dayMacros.carbs }}</div>
-        <div class="item">{{ dayMacros.fats }}</div>
+  <div class="week-wrapper">
+    <weekmain
+      @dateSelected="handleDateSelected"
+      :data="dayTotals"
+    />
+
+    <div class="list">
+      <div class="evernight" v-if="!dayFoods.length">
+        <img src="../../../public/gif/evernight.gif">
+        <p>
+          Nothing to see here
+        </p>
       </div>
-      <div class="weekdays">
-        <div
-          class="day"
-          v-for="value in weekData"
-          :key="value.fullDate"
-          :class="{ active: selectedDate === value.fullDate }"
-          @click="loadDay(value.fullDate)"
-        >
-          <span>{{ value.day }}</span>
-          <p>{{ value.text }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="bot">
-      <div class="page">
-        <h2>Intakes</h2>
-        <FoodItemComponent
-          v-for="food in dayFoods"
-          :key="food.id"
-          :name="food.name"
-          :kcal="food.calories"
-          :proteins="food.protein"
-          :carbs="food.carbs"
-          :fats="food.fat"
-          :portionSize="food.portionSize"
-          :deleteBtn="true"
-          v-if="dayFoods.length !== 0"
-        />
-        <div class="march-holder" v-else>
-          <img src="../../../public/gif/evernight.gif" />
-          <p>This day is yet to come</p>
-          <p>or you starved</p>
-          <p>or just forgor</p>
-        </div>
-      </div>
+      <fooditem v-for="food in dayFoods" :key="food.id" :data="food" @remove="handleRemoveFood" />
     </div>
   </div>
 </template>

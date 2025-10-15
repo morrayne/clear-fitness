@@ -215,14 +215,14 @@ body {
   scale: 2;
 }
 
-.nameform {
+.nameinput {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.nameform form {
+.nameinput form {
   width: 20rem;
   display: flex;
   flex-direction: column;
@@ -230,10 +230,10 @@ body {
   background: var(--sub-bg);
   padding: 0.8rem;
 }
-.nameform form p {
+.nameinput form p {
   font-size: 1.2rem;
 }
-.nameform form input {
+.nameinput form input {
   padding: 0.4rem 0.8rem;
   font-size: 1.2rem;
   color: var(--main-text);
@@ -241,19 +241,88 @@ body {
   border: none;
   outline: none;
 }
-.nameform form input::-moz-placeholder {
+.nameinput form input::-moz-placeholder {
   color: var(--sub-text);
 }
-.nameform form input::placeholder {
+.nameinput form input::placeholder {
   color: var(--sub-text);
 }
-.nameform form .confirm {
+.nameinput form .confirm {
   width: 100%;
   font-size: 1.2rem;
   background: var(--main-text);
   color: var(--main-bg);
   padding: 0.2rem 0;
   border-radius: 6px;
+}
+
+.bodyinputs {
+  height: 100%;
+  display: flex;
+  padding: 0 1rem;
+  flex-direction: column;
+  justify-content: center;
+}
+.bodyinputs .wrapper {
+  width: 100%;
+  max-width: 30rem;
+}
+.bodyinputs .wrapper .pages {
+  height: 25rem;
+  background: var(--sub-bg);
+  display: flex;
+  overflow-x: hidden;
+}
+.bodyinputs .wrapper .pages .page {
+  min-width: 100%;
+  height: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8rem;
+  transition: 0.4s;
+}
+.bodyinputs .wrapper .pages .page input {
+  color: var(--main-text);
+}
+.bodyinputs .wrapper .pages .page .topic {
+  display: flex;
+  flex-direction: column;
+}
+.bodyinputs .wrapper .pages .page .topic span {
+  font-size: 14px;
+  color: var(--sub-text);
+}
+.bodyinputs .wrapper .pages .page .topic p {
+  font-size: 24px;
+}
+.bodyinputs .wrapper .pages .page .alter-input {
+  padding: 0.8rem;
+  border-radius: 0.5rem;
+  border: none;
+  outline: none;
+  background: var(--extra-bg);
+  margin: 1rem 0;
+}
+.bodyinputs .wrapper .controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.bodyinputs .wrapper .controls .goNext,
+.bodyinputs .wrapper .controls .goBack {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+}
+.bodyinputs .wrapper .controls .goNext {
+  background: var(--main-accent);
+}
+.bodyinputs .wrapper .controls .goBack {
+  background: var(--main-text);
+  color: var(--main-bg);
 }
 
 .input-horizontal {
@@ -284,7 +353,7 @@ body {
   background: linear-gradient(90deg, var(--transparent), var(--sub-bg));
 }
 .input-horizontal .value {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   margin-bottom: 12px;
 }
@@ -298,15 +367,15 @@ body {
 }
 .input-horizontal .scale .ticks {
   display: flex;
-  align-items: flex-end;
-  transition: transform 0.15s ease-out;
+  align-items: center;
+  transition: transform 0.2s ease-out;
   height: 100%;
 }
 .input-horizontal .scale .ticks .tick {
   position: relative;
   width: 2px;
   min-width: 2px;
-  height: 12px;
+  height: 1rem;
   background: var(--sub-text);
   margin-right: 8px;
   display: flex;
@@ -315,22 +384,16 @@ body {
   font-size: 10px;
   flex-shrink: 0;
 }
-.input-horizontal .scale .ticks .tick span {
-  font-size: 16px;
-  color: var(--sub-text);
-  font-weight: 700;
-  margin-bottom: 32px;
-}
 .input-horizontal .scale .ticks .tick:last-child {
   margin-right: 0;
 }
 .input-horizontal .scale .ticks .tick.big {
-  height: 32px;
+  height: 3rem;
   font-size: 12px;
   font-weight: 500;
 }
 .input-horizontal .scale .ticks .tick.medium {
-  height: 24px;
+  height: 2rem;
 }
 .input-horizontal .scale .center-line {
   position: absolute;
@@ -338,6 +401,7 @@ body {
   bottom: 0;
   left: 50%;
   width: 5px;
+  border-radius: 1rem;
   background: var(--main-accent);
   transform: translateX(-50%);
   pointer-events: none;
@@ -349,103 +413,128 @@ body {
   text-align: center;
 }
 
-.bodydata {
+.accuracy-options {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.accuracy-options .option {
+  background: var(--extra-bg);
+  padding: 0.5rem 2rem;
+  border-radius: 0.5rem;
+  border: solid 2px var(--extra-bg);
+}
+.accuracy-options .active {
+  border: solid 2px var(--main-accent);
+}
+
+.gender-options {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.gender-options .option {
+  background: var(--extra-bg);
+  padding: 0.5rem 2rem;
+  border-radius: 0.5rem;
+  border: solid 2px var(--extra-bg);
+}
+.gender-options .active {
+  border: solid 2px var(--main-accent);
+}
+
+.activity-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.activity-options .option {
+  background: var(--extra-bg);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  border: solid 2px var(--extra-bg);
+}
+.activity-options .active {
+  border: solid 2px var(--main-accent);
+}
+
+.summary-top {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+.summary-top button {
+  padding: 0.5rem;
+  font-weight: 700;
+}
+.summary-top .active {
+  background: var(--main-text);
+  color: var(--main-bg);
+  border-radius: 0.25rem;
+}
+
+.summary-holder {
   width: 100%;
   height: 100%;
-  position: relative;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+}
+.summary-holder .left {
+  width: 100%;
+  height: 100%;
+  background: var(--extra-bg);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+.summary-holder .left .kcal,
+.summary-holder .left .pcf {
+  width: 50%;
+  height: 100%;
+}
+.summary-holder .left .kcal,
+.summary-holder .left .p,
+.summary-holder .left .c,
+.summary-holder .left .f {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  transition: 1s;
 }
-.bodydata .goBack {
-  width: 3rem;
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background: var(--sub-bg);
-  border-radius: 0.5rem;
-}
-.bodydata .goBack img {
-  filter: invert(var(--svg-invert));
-}
-.bodydata .goNext {
-  padding: 0.5rem 0;
-  font-size: 18px;
-  color: var(--main-bg);
-  font-weight: 500;
-  background: var(--main-text);
-  border-radius: 8px;
-  outline: none;
-}
-.bodydata .bodydata-main {
-  width: 100%;
-  height: 340px;
-  display: flex;
-  overflow-x: hidden;
-  gap: 1rem;
-}
-.bodydata .bodydata-main .page {
-  min-width: 100%;
-  min-height: 100%;
-  background: var(--sub-bg);
-  padding: 1rem;
+.summary-holder .left .pcf {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  transition: 0.4s;
+  gap: 0.5rem;
 }
-.bodydata .bodydata-main .page input[type=number] {
-  background: var(--extra-bg);
-  outline: none;
-  border: none;
-  color: var(--main-text);
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
-  font-size: 18px;
+.summary-holder .left .kcal {
+  background: var(--kcal);
 }
-.bodydata .bodydata-main .page h3 {
+.summary-holder .left .p {
+  background: var(--p);
+}
+.summary-holder .left .c {
+  background: var(--c);
+}
+.summary-holder .left .f {
+  background: var(--f);
+}
+.summary-holder .right {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
-.bodydata .bodydata-main .page h3 span {
-  font-size: 14px;
-  color: var(--sub-text);
-}
-.bodydata .bodydata-main .page h3 p {
-  font-size: 24px;
-}
-.bodydata .bodydata-main .page .active-holder {
+.summary-holder .right .solo {
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.8rem;
-}
-.bodydata .bodydata-main .page .active-holder button {
-  width: 100%;
-  aspect-ratio: 1/1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--extra-bg);
-  border-radius: 8px;
-}
-.bodydata .bodydata-main .page .active-holder .act {
-  outline: solid 4px var(--main-accent);
-}
-.bodydata .bodydata-main .page .gender-holder {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.8rem;
-  padding-bottom: 4rem;
-}
-.bodydata .bodydata-main .page .gender-holder button {
-  width: 100%;
-  aspect-ratio: 1/1;
-  background: var(--extra-bg);
-  border-radius: 8px;
-}
-.bodydata .bodydata-main .page .gender-holder .act {
-  outline: solid 3px var(--main-accent);
+  border-radius: 0.25rem;
 }
 
 .intakes {
@@ -513,97 +602,132 @@ body {
 }
 
 .addrecord {
-  width: 100%;
   height: 100%;
-  padding: 0 0 calc(var(--header-height) + 3rem);
+  display: flex;
+  position: relative;
 }
-.addrecord .record-nav {
+.addrecord .nav {
   width: 100%;
   height: 3rem;
   position: fixed;
   bottom: var(--header-height);
   background: var(--sub-bg);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-top: solid 1px var(--header-border);
+  z-index: 1000;
 }
-.addrecord .record-nav button {
-  border-top: solid 2px var(--header-border);
+.addrecord .nav li {
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--extra-bg);
+  border-radius: 0.25rem;
 }
-.addrecord .record-nav .act {
-  border-top: solid 2px var(--main-text);
+.addrecord .nav .active {
+  background: var(--main-accent);
 }
 .addrecord .pages {
+  width: 100%;
   height: 100%;
   display: flex;
 }
 .addrecord .pages .page {
   min-width: 100%;
-  height: 100%;
-  padding: 1rem;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: 0.4s;
 }
-.addrecord .pages .page h3 {
-  font-size: 24px;
-}
-.addrecord .pages .page .finish {
-  width: 100%;
-  padding: 0.4rem 0;
+.addrecord .pages .page .send {
   background: var(--main-text);
   color: var(--main-bg);
-  font-weight: 700;
-  border-radius: 0.5rem;
-  margin: 1rem 0 0.5rem;
+  margin: 1rem 1rem 0;
+  padding: 0.25rem 0;
+  border-radius: 0.25rem;
+  font-size: 1.25rem;
 }
-.addrecord .pages .page .nothingYet {
+.addrecord .pages .page .list {
   width: 100%;
   height: 100%;
+  overflow-y: scroll;
+  padding: 0 0 calc(3rem + var(--header-height) + 1rem);
+}
+.addrecord .pages .page .center {
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.addrecord .pages .page .asset-form {
+  width: 80%;
+  background: var(--sub-bg);
+  padding: 1rem;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+}
+.addrecord .pages .page .asset-form .mode {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: 0.5rem;
+  background: var(--extra-bg);
+}
+.addrecord .pages .page .asset-form .mode button {
+  border-radius: 0.35rem;
+  padding: 0.15rem 0;
+}
+.addrecord .pages .page .asset-form .mode .onetime,
+.addrecord .pages .page .asset-form .mode .permament {
+  background: var(--extra-text);
+  border-radius: 0.35rem;
+}
+.addrecord .pages .page .asset-form .active {
+  background: var(--main-accent);
+}
+.addrecord .pages .page .asset-form input {
+  width: 100%;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--extra-bg);
+  color: var(--main-text);
+  outline: none;
+  border: none;
+}
+.addrecord .pages .page .asset-form .mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+.addrecord .pages .page .asset-form .clear,
+.addrecord .pages .page .asset-form .confirm {
+  padding: 0.3rem 1rem;
+  border-radius: 0.5rem;
+}
+.addrecord .pages .page .asset-form .clear {
+  background: var(--main-text);
+  color: var(--main-bg);
+}
+.addrecord .pages .page .asset-form .confirm {
+  background: var(--main-accent);
+}
+.addrecord .pages .center {
+  display: flex;
   justify-content: center;
   align-items: center;
 }
-.addrecord .pages .page .nothingYet img {
-  max-width: 15rem;
-}
-.addrecord .pages .page .nothingYet p {
-  font-size: 1.2rem;
-  margin-top: 1rem;
-}
-.addrecord .pages .page .input-holder {
-  display: flex;
-  flex-direction: column;
-  background: var(--sub-bg);
-  border-radius: 0.5rem;
-  padding: 0.8rem;
-  gap: 1rem;
-}
-.addrecord .pages .page .input-holder input {
-  width: 100%;
-  color: var(--main-text);
-  background: var(--extra-bg);
-  border: none;
-  border-radius: 0.5rem;
-  outline: none;
-  padding: 0.5rem 1rem;
-}
-.addrecord .pages .page .input-holder .bju {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-.addrecord .pages .page .input-holder .addasset {
-  padding: 0.5rem 1rem;
-  background: var(--main-text);
-  color: var(--main-bg);
-  border-radius: 0.6rem;
-}
 
 .food-item {
-  width: 100%;
+  flex: 1;
   background: var(--sub-bg);
-  margin-top: 0.5rem;
+  margin: 1rem 1rem 0;
   padding: 0.5rem;
   display: flex;
   gap: 1rem;
@@ -644,4 +768,91 @@ body {
 }
 .food-item .right .info p {
   color: var(--sub-text);
+}
+
+.assets {
+  height: 100%;
+  overflow: hidden;
+  padding: 0 0 cal(var(--header-height)3rem1rem);
+  display: flex;
+  flex-direction: column;
+}
+.assets .top {
+  background: var(--sub-bg);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+.assets .top button {
+  background: var(--extra-bg);
+  border-radius: 0.35rem;
+  padding: 0.15rem;
+}
+.assets .top .active {
+  background: var(--main-accent);
+}
+.assets .list {
+  overflow-y: scroll;
+}
+
+.disabled-week {
+  pointer-events: none;
+}
+
+.weekmain {
+  width: 100%;
+  background: var(--sub-bg);
+  border-bottom: solid 1px var(--header-border);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.weekmain .top {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.75rem;
+}
+.weekmain .top .item {
+  aspect-ratio: 2/3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--extra-bg);
+  border-radius: 10rem;
+}
+.weekmain .top .item p,
+.weekmain .top .item span {
+  text-align: center;
+}
+.weekmain .top .active {
+  border: solid 2px var(--main-accent);
+}
+.weekmain .bot {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+.weekmain .bot p {
+  background: var(--extra-bg);
+  padding: 0.2rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.evernight img {
+  margin: auto;
+  margin-top: 10rem;
+}
+.evernight p {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.settings {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }/*# sourceMappingURL=main.css.map */

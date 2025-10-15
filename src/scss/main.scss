@@ -2,17 +2,18 @@
 @use "./globals";
 @use "./fonts";
 
-
 // PAGES
+// header
 @use "../header/scss/main";
-@use "../pages/nameform/scss/style";
-
-// 
-@use "../pages/bodydata/scss/custominput";
-@use "../pages/bodydata/scss/bodydata";
-
-// 
+// nameinput
+@use '../pages/nameinput/nameinput';
+// bodyinput
+@use "../pages/bodyinput/bodyinput";
+// intakes
 @use "../pages/intakes/scss/intakes";
-
+// addrecord
+@use '../pages/addrecord/addrecord';
 // 
-@use "../pages/addrecord/scss/addrecord";
+@use '../week/weekmain';
+// 
+@use '../pages/settings/settings';
